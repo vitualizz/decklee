@@ -9,8 +9,8 @@ export { highlight, wrapLines, SUPPORTED_LANGUAGES } from "./highlight.js";
 export { validateTheme } from "./validate-theme.js";
 export type { ThemeValidationResult } from "./validate-theme.js";
 
-/** Absolute URL to the aggregated token stylesheet (color + type + space + syntax). */
-export const TOKENS_CSS_PATH = new URL("./tokens/index.css", import.meta.url).href;
-
-/** Absolute URL to the dev theme stylesheet. */
-export const DEV_THEME_CSS_PATH = new URL("./themes/dev/dev.css", import.meta.url).href;
+// NOTE (GC-4): the former TOKENS_CSS_PATH / DEV_THEME_CSS_PATH constants were removed.
+// They resolved against import.meta.url → dist/tokens/* which tsc never emits (CSS lives
+// only in src/), so they were broken for every consumer. The CSS is exposed via the
+// package "exports" map instead — import "@decklee/design-system/tokens" (and
+// "@decklee/design-system/themes/dev"), which Vite/Astro resolve to the real src files.

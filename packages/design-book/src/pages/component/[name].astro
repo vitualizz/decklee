@@ -37,20 +37,20 @@ const title = `${fixture.title} — Playground`;
 ---
 
 <BookShell title={title} currentHref={`/component/${fixture.name}`}>
-  <div class="dk-landing__col dk-play-focus">
-    <h1 class="dk-play-focus__title">{fixture.title}</h1>
+  <div class="dk-landing__col dk-component-focus">
+    <h1 class="dk-component-focus__title">{fixture.title}</h1>
 
-    <div class="dk-play-grid">
+    <div class="dk-component-grid">
       {fixture.variants.map((v) => (
         <div
-          class={v.stress ? "dk-play-cell dk-play-stress" : "dk-play-cell"}
+          class={v.stress ? "dk-component-cell dk-component-stress" : "dk-component-cell"}
           data-stress={v.stress || undefined}
         >
-          <div class="dk-play-cell__head">
-            <h3 class="dk-play-cell__name">{v.name}</h3>
-            {v.stress && <span class="dk-play-badge">STRESS</span>}
+          <div class="dk-component-cell__head">
+            <h3 class="dk-component-cell__name">{v.name}</h3>
+            {v.stress && <span class="dk-component-badge">STRESS</span>}
           </div>
-          {v.note && <p class="dk-play-cell__note">{v.note}</p>}
+          {v.note && <p class="dk-component-cell__note">{v.note}</p>}
           <PrimitiveStage label={`Live preview: ${fixture.title} — ${v.name}`}>
             <Comp {...(v.props as any)} />
           </PrimitiveStage>
@@ -59,10 +59,10 @@ const title = `${fixture.title} — Playground`;
     </div>
 
     {isDraft && (
-      <section class="dk-play-promotion" aria-labelledby="promotion-heading">
+      <section class="dk-component-promotion" aria-labelledby="promotion-heading">
         <h2 id="promotion-heading">Promotion checklist</h2>
         <p>Draft primitives are book-local. To publish this primitive, complete:</p>
-        <ol class="dk-play-promotion__list">
+        <ol class="dk-component-promotion__list">
           {PROMOTION_CHECKLIST.map((step) => (
             <li>{step}</li>
           ))}
@@ -73,11 +73,11 @@ const title = `${fixture.title} — Playground`;
 </BookShell>
 
 <style>
-  .dk-play-focus {
+  .dk-component-focus {
     padding-block: var(--dk-space-slide-pad-y);
   }
 
-  .dk-play-focus__title {
+  .dk-component-focus__title {
     margin: 0 0 var(--dk-space-8);
     font-family: var(--dk-type-family-display);
     font-weight: var(--dk-type-weight-bold);
@@ -86,26 +86,26 @@ const title = `${fixture.title} — Playground`;
     font-size: clamp(40px, 6vw, 88px);
   }
 
-  .dk-play-grid {
+  .dk-component-grid {
     display: grid;
     gap: var(--dk-space-slide-pad-y);
     grid-template-columns: 1fr;
   }
 
   @media (min-width: 1024px) {
-    .dk-play-grid {
+    .dk-component-grid {
       grid-template-columns: 1fr 1fr;
     }
   }
 
-  .dk-play-cell__head {
+  .dk-component-cell__head {
     display: flex;
     align-items: center;
     gap: var(--dk-space-4);
     margin-block-end: var(--dk-space-3);
   }
 
-  .dk-play-cell__name {
+  .dk-component-cell__name {
     margin: 0;
     font-family: var(--dk-type-family-display);
     font-weight: var(--dk-type-weight-bold);
@@ -113,7 +113,7 @@ const title = `${fixture.title} — Playground`;
     font-size: clamp(20px, 2.5vw, 30px);
   }
 
-  .dk-play-badge {
+  .dk-component-badge {
     padding: var(--dk-space-1) var(--dk-space-3);
     border: 1px solid var(--dk-color-accent-2);
     color: var(--dk-color-accent-2);
@@ -122,24 +122,24 @@ const title = `${fixture.title} — Playground`;
     letter-spacing: var(--dk-type-ls-display);
   }
 
-  .dk-play-cell__note {
+  .dk-component-cell__note {
     margin: 0 0 var(--dk-space-4);
     color: var(--dk-color-fg-secondary);
     font-size: var(--dk-type-scale-caption);
   }
 
-  .dk-play-stress {
+  .dk-component-stress {
     outline: 1px dashed var(--dk-color-accent-2);
     outline-offset: var(--dk-space-3);
   }
 
-  .dk-play-promotion {
+  .dk-component-promotion {
     margin-block-start: var(--dk-space-slide-pad-y);
     padding-block-start: var(--dk-space-8);
     border-top: 1px solid var(--dk-color-border);
   }
 
-  .dk-play-promotion__list {
+  .dk-component-promotion__list {
     color: var(--dk-color-fg-secondary);
     line-height: var(--dk-type-lh-relaxed, 1.6);
   }

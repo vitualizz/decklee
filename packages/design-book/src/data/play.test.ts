@@ -268,12 +268,12 @@ describe("Build smoke — dist/component/hero/index.html (harness page)", () => 
     expect(html).not.toMatch(/class="reveal"/);
   });
 
-  it("(E7) contains stress marker for the overflow variant (dk-play-stress or STRESS)", () => {
-    const hasStressClass = html.includes("dk-play-stress");
+  it("(E7) contains stress marker for the overflow variant (dk-component-stress or STRESS)", () => {
+    const hasStressClass = html.includes("dk-component-stress");
     const hasStressBadge = html.includes("STRESS");
     expect(
       hasStressClass || hasStressBadge,
-      "Expected dk-play-stress class or STRESS badge for the overflow variant"
+      "Expected dk-component-stress class or STRESS badge for the overflow variant"
     ).toBe(true);
   });
 

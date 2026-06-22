@@ -1,0 +1,7 @@
+schema_version: "1"
+stack:
+  - node
+  - typescript
+  - astro
+  - vitest
+file_structure: "Greenfield monorepo; no top-level source directories present yet — intended packages map to four pillars (core UI builder, CLI contract, templates/design-system, demo decks)."

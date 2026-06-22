@@ -1,0 +1,36 @@
+{
+  "name": "decklee",
+  "version": "0.1.0",
+  "description": "DeckLee CLI — build, validate, and scaffold validated presentation decks as JSON; generates the AI-assistant contract (AGENTS.md + skills).",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "decklee": "./dist/bin.js"
+  },
+  "main": "./dist/bin.js",
+  "files": [
+    "dist",
+    "templates",
+    "src/prompts",
+    "src/examples"
+  ],
+  "engines": {
+    "node": ">=20.6"
+  },
+  "scripts": {
+    "build": "node --experimental-strip-types scripts/copy-template.ts && tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "generate:agents-md": "node --experimental-strip-types scripts/generate-contract.ts"
+  },
+  "dependencies": {
+    "@decklee/core": "workspace:*",
+    "@decklee/schema": "workspace:*",
+    "@decklee/design-system": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5",
+    "vitest": "^3"
+  }
+}

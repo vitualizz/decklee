@@ -1,0 +1,55 @@
+{
+  "schema_version": "1",
+  "kind": "deck",
+  "id": "deck-why-decklee",
+  "meta": {
+    "title": "Why DeckLee",
+    "theme_id": "dev",
+    "source_outline_id": null
+  },
+  "slides": [
+    {
+      "id": "s1",
+      "layout": "hero",
+      "content_props": {
+        "headline": "Why DeckLee",
+        "subheadline": "Decks as validated JSON, rendered for you"
+      },
+      "speaker_notes": "Set the frame: this is a pitch, keep it brisk."
+    },
+    {
+      "id": "s2",
+      "layout": "two-up",
+      "content_props": {
+        "left_heading": "The Old Way",
+        "left_body": "Fight slide tools, copy-paste styles, redo it for every theme.",
+        "right_heading": "With DeckLee",
+        "right_body": "Describe the content once; swap themes with one field.",
+        "left_type": "text",
+        "right_type": "text"
+      },
+      "speaker_notes": "Make the contrast feel concrete and relatable."
+    },
+    {
+      "id": "s3",
+      "layout": "quote",
+      "content_props": {
+        "quote": "We cut deck production from a day to ten minutes.",
+        "attribution": "An early adopter",
+        "context": "Internal pilot, 2026",
+        "emphasis": "ruled"
+      },
+      "speaker_notes": "Drop the social proof here."
+    },
+    {
+      "id": "s4",
+      "layout": "hero",
+      "content_props": {
+        "headline": "Start with one deck",
+        "subheadline": "decklee init && decklee build deck.json",
+        "eyebrow": "Get going"
+      },
+      "speaker_notes": "Clear single call to action to close."
+    }
+  ]
+}

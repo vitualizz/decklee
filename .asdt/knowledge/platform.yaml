@@ -1,0 +1,26 @@
+schema_version: "1"
+scanned_at: "2026-06-20T21:05:19Z"
+detected_stack:
+  - node
+  - typescript
+  - astro
+  - vitest
+conventions:
+  file_structure: "Greenfield monorepo; no top-level source directories present yet — intended packages map to four pillars (core UI builder, CLI contract, templates/design-system, demo decks)."
+  design_fingerprint:
+    source: "talks deck a-better-process.astro (ASDT /site) — flagship theme basis; full extract in engram obs 2415 (decklee/v1-mvp/reference/talks-deck-fingerprint)"
+    color_space: oklch
+    mode: "dark default (light variant exists)"
+    palette:
+      bg_base: "#0b0c11"
+      text_primary: "#f5f7fb"
+      text_body: "#dfe4ec"
+      text_muted: "#9aa3b2"
+      accent_hues_chroma_0_145: "PM 75, Architect 300, Developer 245, QA 155, Security 25, UX 340, Researcher 195"
+    type:
+      display: "Space Grotesk 400-700"
+      body: "Instrument Sans 400-600"
+      mono: "JetBrains Mono 400-700"
+    canvas: "1920x1080 (16:9)"
+    voice: "editorial, dark, minimal, typography-led, glassmorphism + subtle glows, semantic color-coding"
+    runtime_note: "talks deck runs on reveal.js v6.0.1 + inline styles (PoC anti-pattern); DeckLee architect to decide reveal.js vs custom zero-dep runtime"

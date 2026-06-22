@@ -1,0 +1,43 @@
+---
+interface StoryMapEntry {
+  index: number;
+  id: string;
+  label: string;
+  primitive: string | null;
+}
+
+interface Props {
+  stories: StoryMapEntry[];
+}
+
+const { stories } = Astro.props;
+const initialLabel = stories[0]?.label ?? "";
+// Baked index→label map; the BookLayout client script reads it on slidechanged.
+const storyMap = JSON.stringify(stories.map((s) => s.label));
+---
+
+<p
+  class="dk-story-header"
+  id="dk-story-header"
+  aria-live="polite"
+  aria-atomic="true"
+  data-story-map={storyMap}
+>
+  {initialLabel}
+</p>
+
+<style>
+  .dk-story-header {
+    margin: 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: var(--dk-space-3) var(--dk-space-4);
+    color: var(--dk-color-fg-muted);
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    letter-spacing: var(--dk-type-ls-eyebrow);
+    text-transform: uppercase;
+    transition: opacity 150ms ease;
+  }
+</style>

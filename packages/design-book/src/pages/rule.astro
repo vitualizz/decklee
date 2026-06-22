@@ -1,0 +1,52 @@
+---
+import TwoUp from "@decklee/design-system/primitives/TwoUp.astro";
+import Quote from "@decklee/design-system/primitives/Quote.astro";
+
+import BookShell from "../components/BookShell.astro";
+import LandingSection from "../components/LandingSection.astro";
+import PrimitiveStage from "../components/PrimitiveStage.astro";
+
+import { STORIES } from "../data/design-book.js";
+
+/**
+ * /rule — the §04 The Rule content, split out of the old single-page index.
+ * Reuses Quote/TwoUp primitives inside PrimitiveStage. Page owns its <h1>.
+ */
+const ruleStatement = STORIES.find((s) => s.id === "rule-statement");
+const ruleConstraints = STORIES.find((s) => s.id === "rule-constraints");
+
+const ruleStatementProps = ruleStatement ? (ruleStatement.props as any) : null;
+const ruleConstraintsProps = ruleConstraints ? (ruleConstraints.props as any) : null;
+---
+
+<BookShell title="The Rule — Design Book" currentHref="/rule">
+  <h1>The Rule</h1>
+  <LandingSection
+    id="the-rule"
+    eyebrow="04 / The Rule"
+    heading="One rule keeps it honest"
+    subheading="The layout brain sets layout and content_props — and never writes CSS."
+  >
+    <div class="dk-landing__col dk-rule-stack">
+      {ruleStatementProps && (
+        <PrimitiveStage label="Live preview: Quote — the contract">
+          <Quote {...ruleStatementProps} />
+        </PrimitiveStage>
+      )}
+      {ruleConstraintsProps && (
+        <PrimitiveStage label="Live preview: Two-Up — prop-only API + constraints">
+          <TwoUp {...ruleConstraintsProps} />
+        </PrimitiveStage>
+      )}
+    </div>
+  </LandingSection>
+</BookShell>
+
+<style>
+  .dk-rule-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dk-space-slide-pad-y);
+    padding-block-start: var(--dk-space-8);
+  }
+</style>

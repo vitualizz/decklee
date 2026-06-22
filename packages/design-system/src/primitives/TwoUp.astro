@@ -1,0 +1,99 @@
+---
+import type { TwoUpProps } from "@decklee/schema";
+
+type Props = TwoUpProps & { theme_id: string };
+
+const {
+  left_body,
+  right_body,
+  left_heading,
+  right_heading,
+  left_type = "text",
+  right_type = "text",
+  left_image_src,
+  left_image_alt,
+  right_image_src,
+  right_image_alt,
+  divider = true,
+  theme_id,
+} = Astro.props;
+
+void theme_id;
+
+const showLeftImage = left_type === "image" && Boolean(left_image_src);
+const showRightImage = right_type === "image" && Boolean(right_image_src);
+---
+
+<section class="dk-twoup" data-layout="two-up">
+  <div
+    class="dk-twoup__pane dk-twoup__pane--left"
+    aria-label={left_heading ? undefined : "left panel"}
+  >
+    {left_heading && <h2 class="dk-twoup__heading">{left_heading}</h2>}
+    {showLeftImage ? (
+      <img class="dk-twoup__image" src={left_image_src} alt={left_image_alt ?? ""} />
+    ) : (
+      <p class="dk-twoup__body">{left_body}</p>
+    )}
+  </div>
+  {divider && <div class="dk-twoup__divider" aria-hidden="true"></div>}
+  <div
+    class="dk-twoup__pane dk-twoup__pane--right"
+    aria-label={right_heading ? undefined : "right panel"}
+  >
+    {right_heading && <h2 class="dk-twoup__heading">{right_heading}</h2>}
+    {showRightImage ? (
+      <img class="dk-twoup__image" src={right_image_src} alt={right_image_alt ?? ""} />
+    ) : (
+      <p class="dk-twoup__body">{right_body}</p>
+    )}
+  </div>
+</section>
+
+<style>
+  .dk-twoup {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--dk-space-10);
+    padding: var(--dk-space-slide-pad-y) var(--dk-space-slide-pad-x);
+    background-color: var(--dk-color-bg-base);
+    color: var(--dk-color-fg-primary);
+  }
+
+  .dk-twoup__pane {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dk-space-5);
+  }
+
+  .dk-twoup__heading {
+    margin: 0;
+    font-family: var(--dk-type-family-display);
+    font-size: var(--dk-type-scale-h2);
+    font-weight: var(--dk-type-weight-bold);
+    line-height: var(--dk-type-lh-base);
+    letter-spacing: var(--dk-type-ls-display);
+    color: var(--dk-color-fg-primary);
+  }
+
+  .dk-twoup__body {
+    margin: 0;
+    font-family: var(--dk-type-family-body);
+    font-size: var(--dk-type-scale-body);
+    line-height: var(--dk-type-lh-relaxed);
+    color: var(--dk-color-fg-secondary);
+  }
+
+  .dk-twoup__image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .dk-twoup__divider {
+    width: var(--dk-space-1);
+    align-self: stretch;
+    background-color: var(--dk-color-border);
+  }
+</style>

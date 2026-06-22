@@ -1,0 +1,290 @@
+---
+import "reveal.js/reset.css";
+import "reveal.js/reveal.css";
+import "@decklee/design-system/tokens";
+import "@decklee/design-system/themes/dev";
+import SectionRail from "./SectionRail.astro";
+import StoryHeader from "./StoryHeader.astro";
+import type { SectionNavItem } from "../data/design-book.js";
+
+interface StoryMapEntry {
+  index: number;
+  id: string;
+  label: string;
+  primitive: string | null;
+}
+
+interface Props {
+  title: string;
+  slideCount: number;
+  sections: SectionNavItem[];
+  storyMap: StoryMapEntry[];
+}
+
+const { title, slideCount, sections, storyMap } = Astro.props;
+
+// Verbatim from packages/core/src/assemble.ts — the only fonts the deck references.
+const GOOGLE_FONTS_HREF =
+  "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap";
+
+const initialActive = sections[0]?.id ?? "";
+---
+
+<!doctype html>
+<html lang="en" data-theme="dev">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={GOOGLE_FONTS_HREF} />
+  </head>
+  <body>
+    <a class="dk-skip sr-only" href="#dk-stage">Skip to slides</a>
+    <h1 class="sr-only">{title}</h1>
+
+    <div class="dk-book">
+      <nav class="dk-book-chrome dk-book__rail" aria-label="Design book sections">
+        <SectionRail sections={sections} initialActive={initialActive} />
+      </nav>
+
+      <main id="dk-stage" class="dk-book__stage" aria-label={`Slide deck, ${slideCount} slides`}>
+        <div class="dk-book-chrome dk-book__header">
+          <StoryHeader stories={storyMap} />
+          <span id="dk-scale-display" class="dk-book__scale" aria-live="off">scale 1.00</span>
+        </div>
+        <div class="reveal" data-theme="dev">
+          <slot />
+        </div>
+      </main>
+
+      <aside class="dk-book-chrome dk-book__sidebar" aria-label="Component reference">
+        <slot name="sidebar" />
+      </aside>
+    </div>
+
+    <script>
+      import { configureReveal } from "@decklee/viewer/reveal-config";
+
+      function readStoryLabels(): string[] {
+        const el = document.getElementById("dk-story-header");
+        if (!el) return [];
+        try {
+          return JSON.parse(el.getAttribute("data-story-map") ?? "[]");
+        } catch {
+          return [];
+        }
+      }
+
+      function bootDeck(): void {
+        const revealEl = document.querySelector<HTMLElement>(".reveal");
+        if (!revealEl) return;
+
+        configureReveal(revealEl);
+
+        // reduced-motion: honor prefers-reduced-motion per NFR-02 — disable the
+        // fade transition for users who asked for less motion (runtime check).
+        const prefersReducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        (window as any).Reveal?.configure?.({
+          transition: prefersReducedMotion ? "none" : "fade",
+        });
+
+        const labels = readStoryLabels();
+        const header = document.getElementById("dk-story-header");
+        const railButtons = Array.from(
+          document.querySelectorAll<HTMLButtonElement>(".dk-rail__btn"),
+        );
+
+        // Section jump.
+        railButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const index = Number(btn.dataset.firstSlideIndex ?? "0");
+            (revealEl as any).__revealApi?.slide?.(index);
+            window.location.hash = window.location.hash; // no-op safety
+            const deck = (window as any).Reveal;
+            if (deck?.slide) deck.slide(index);
+          });
+        });
+
+        // slidechanged: update header label + rail aria-current.
+        revealEl.addEventListener("slidechanged", (e: Event) => {
+          const idx = (e as any).indexh ?? 0;
+          if (header && labels[idx] !== undefined) header.textContent = labels[idx];
+          const current = document.querySelectorAll<HTMLElement>(".slides > section[data-id]")[idx];
+          const sectionId = current?.getAttribute("data-section-id");
+          railButtons.forEach((btn) => {
+            if (btn.dataset.sectionId === sectionId) {
+              btn.setAttribute("aria-current", "page");
+            } else {
+              btn.removeAttribute("aria-current");
+            }
+          });
+        });
+
+        // Print: P/p → window.print() (Reveal 6 has no native 'p' binding).
+        document.addEventListener("keydown", (e) => {
+          if ((e.key === "p" || e.key === "P") && !e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            window.print();
+          }
+        });
+
+        // Live scale readout (min(vw/1920, vh/1080)).
+        const scaleEl = document.getElementById("dk-scale-display");
+        const updateScale = () => {
+          if (!scaleEl) return;
+          const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+          scaleEl.textContent = `scale ${scale.toFixed(2)}`;
+        };
+        if ("ResizeObserver" in window) {
+          new ResizeObserver(updateScale).observe(document.documentElement);
+        }
+        window.addEventListener("resize", updateScale);
+        updateScale();
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", bootDeck, { once: true });
+      } else {
+        bootDeck();
+      }
+    </script>
+
+    <style is:global>
+      :root {
+        color-scheme: dark;
+      }
+
+      html,
+      body {
+        margin: 0;
+        background-color: var(--dk-color-bg-base);
+        color: var(--dk-color-fg-primary);
+        font-family: var(--dk-type-family-body);
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .dk-skip:focus {
+        position: fixed;
+        top: var(--dk-space-3);
+        left: var(--dk-space-3);
+        width: auto;
+        height: auto;
+        clip: auto;
+        z-index: 100;
+        padding: var(--dk-space-3) var(--dk-space-4);
+        background: var(--dk-color-bg-surface);
+        color: var(--dk-color-fg-primary);
+        outline: 2px solid var(--dk-color-accent-1);
+      }
+
+      .dk-book {
+        display: grid;
+        grid-template-columns: 220px 1fr 360px;
+        min-height: 100vh;
+      }
+
+      .dk-book__rail {
+        border-right: 1px solid var(--dk-color-border);
+        background: var(--dk-color-bg-surface);
+        overflow-y: auto;
+      }
+
+      .dk-book__stage {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .dk-book__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--dk-color-border);
+        background: var(--dk-color-bg-surface);
+      }
+
+      .dk-book__scale {
+        padding: var(--dk-space-3) var(--dk-space-4);
+        font-family: var(--dk-type-family-code);
+        font-size: var(--dk-type-scale-caption);
+        color: var(--dk-color-fg-muted);
+      }
+
+      .dk-book__sidebar {
+        border-left: 1px solid var(--dk-color-border);
+        background: var(--dk-color-bg-surface);
+        overflow-y: auto;
+      }
+
+      /* ── Deck canvas ──
+         reveal.css defaults `.reveal-viewport` to background #fff / color #000
+         (it expects a reveal THEME to override). DeckLee ships no reveal theme —
+         our design tokens ARE the theme — so we own the canvas background here,
+         or the 1920x1080 stage renders as a white void. */
+      .reveal-viewport {
+        background-color: var(--dk-color-bg-base);
+        color: var(--dk-color-fg-primary);
+      }
+      html:not(.print-pdf) .reveal {
+        background: transparent;
+      }
+
+      /* Each slide fills the canvas and centers its content group; the primitive
+         spans full width. The story label lives in the top bar (StoryHeader), so
+         the stacked-fallback heading is hidden inside the interactive deck. */
+      .reveal .slides > section.dk-stack-section {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--dk-space-6);
+      }
+      .reveal .dk-stack-section > [data-layout] {
+        width: 100%;
+      }
+      .reveal .dk-stack-section__heading {
+        display: none;
+      }
+
+      /* Tablet: rail + sidebar fold under the stage. */
+      @media (max-width: 1023px) {
+        .dk-book {
+          grid-template-columns: 1fr;
+        }
+        .dk-book__rail {
+          border-right: 0;
+          border-bottom: 1px solid var(--dk-color-border);
+        }
+        .dk-book__sidebar {
+          border-left: 0;
+          border-top: 1px solid var(--dk-color-border);
+        }
+      }
+
+      /* Print: one slide per page (reveal.css @media print), chrome hidden. */
+      @media print {
+        .dk-book-chrome {
+          display: none !important;
+        }
+        .dk-book {
+          display: block;
+        }
+      }
+    </style>
+  </body>
+</html>

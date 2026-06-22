@@ -1,0 +1,56 @@
+{
+  "schema_version": "1",
+  "kind": "deck",
+  "id": "deck-better-process",
+  "meta": {
+    "title": "A Better Process",
+    "theme_id": "dev",
+    "source_outline_id": "outline-better-process"
+  },
+  "slides": [
+    {
+      "id": "s1",
+      "layout": "hero",
+      "content_props": {
+        "headline": "A Better Process",
+        "subheadline": "Ship the contract, not the chaos",
+        "eyebrow": "Engineering"
+      },
+      "speaker_notes": "Open with the pain everyone in the room recognizes."
+    },
+    {
+      "id": "s2",
+      "layout": "two-up",
+      "content_props": {
+        "left_heading": "The Problem",
+        "left_body": "Hand-written deck markup drifts from the data and breaks on every edit.",
+        "right_heading": "The Solution",
+        "right_body": "Author validated JSON; let the renderer own the styling.",
+        "divider": true
+      },
+      "speaker_notes": "Contrast the old way with the new way side by side."
+    },
+    {
+      "id": "s3",
+      "layout": "code",
+      "content_props": {
+        "heading": "The whole deck is data",
+        "language": "json",
+        "code": "{\n  \"layout\": \"hero\",\n  \"content_props\": { \"headline\": \"Hello\" }\n}",
+        "highlight_lines": [2],
+        "caption": "One validated shape, every slide."
+      },
+      "speaker_notes": "Show how compact and reviewable the source is."
+    },
+    {
+      "id": "s4",
+      "layout": "quote",
+      "content_props": {
+        "quote": "The best styling is the styling you never have to write.",
+        "attribution": "DeckLee",
+        "emphasis": "centered"
+      },
+      "speaker_notes": "Land the thesis and invite questions."
+    }
+  ]
+}

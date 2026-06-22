@@ -1,0 +1,97 @@
+---
+interface Item {
+  label: string;
+  detail?: string;
+}
+
+interface Props {
+  variant: "checklist" | "steps";
+  items: Item[];
+}
+
+const { variant, items } = Astro.props;
+---
+
+<div class="dk-contrib">
+  {variant === "checklist" ? (
+    <ul class="dk-contrib__list dk-contrib__list--check">
+      {items.map((item) => (
+        <li class="dk-contrib__item">
+          <svg class="dk-contrib__icon" viewBox="0 0 16 16" aria-hidden="true" width="16" height="16">
+            <path d="M2 8.5l3.5 3.5L14 3.5" fill="none" stroke="currentColor" stroke-width="2" />
+          </svg>
+          <span class="dk-contrib__body">
+            <span class="dk-contrib__label">{item.label}</span>
+            {item.detail && <code class="dk-contrib__detail">{item.detail}</code>}
+          </span>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <ol class="dk-contrib__list dk-contrib__list--steps">
+      {items.map((item) => (
+        <li class="dk-contrib__item">
+          <span class="dk-contrib__body">
+            <span class="dk-contrib__label">{item.label}</span>
+            {item.detail && <code class="dk-contrib__detail">{item.detail}</code>}
+          </span>
+        </li>
+      ))}
+    </ol>
+  )}
+</div>
+
+<style>
+  .dk-contrib {
+    padding: var(--dk-space-4);
+    background: var(--dk-color-bg-surface);
+    border: 1px solid var(--dk-color-border);
+  }
+
+  .dk-contrib__list {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--dk-space-3);
+  }
+
+  .dk-contrib__list--check {
+    list-style: none;
+  }
+
+  .dk-contrib__list--steps {
+    padding-left: var(--dk-space-6);
+  }
+
+  .dk-contrib__item {
+    display: flex;
+    gap: var(--dk-space-3);
+    color: var(--dk-color-fg-primary);
+    font-family: var(--dk-type-family-body);
+    font-size: var(--dk-type-scale-caption);
+  }
+
+  .dk-contrib__list--steps .dk-contrib__item::marker {
+    color: var(--dk-color-accent-1);
+    font-family: var(--dk-type-family-code);
+    font-weight: var(--dk-type-weight-bold);
+  }
+
+  .dk-contrib__icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--dk-color-accent-1);
+  }
+
+  .dk-contrib__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dk-space-1);
+  }
+
+  .dk-contrib__detail {
+    font-family: var(--dk-type-family-code);
+    color: var(--dk-color-fg-muted);
+  }
+</style>

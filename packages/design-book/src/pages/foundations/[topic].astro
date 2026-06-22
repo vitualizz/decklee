@@ -1,0 +1,70 @@
+---
+import BookShell from "../../components/BookShell.astro";
+import FoundationSection from "../../components/FoundationSection.astro";
+import {
+  COLOR_SWATCHES,
+  TOKEN_ROWS,
+  TYPE_SCALE,
+  TYPE_FAMILIES,
+  SPACING_STEPS,
+  SPACING_PADS,
+} from "../../data/token-data.js";
+
+/**
+ * /foundations/<topic> — one foundation token surface per page.
+ *
+ * Splits the old single-page §01 Foundations into three routes. FoundationSection
+ * is reused verbatim; obs-2633: the per-topic prop selection lives in frontmatter,
+ * the template only spreads the resolved object.
+ */
+export function getStaticPaths() {
+  return ["color", "typography", "spacing"].map((topic) => ({ params: { topic } }));
+}
+
+const { topic } = Astro.params;
+
+const TOPIC_META: Record<string, { title: string; heading: string }> = {
+  color: { title: "Color — Design Book", heading: "Color" },
+  typography: { title: "Typography — Design Book", heading: "Typography" },
+  spacing: { title: "Spacing — Design Book", heading: "Spacing" },
+};
+
+const { title, heading } = TOPIC_META[topic as string];
+
+// Map verbatim from the old index.astro FoundationSection usages.
+const SECTION_PROPS: Record<string, Record<string, unknown>> = {
+  color: {
+    anchor: "foundation-color",
+    heading: "Color",
+    viz: "color-swatches",
+    tokenCategory: "color",
+    tokenRows: TOKEN_ROWS,
+    swatches: COLOR_SWATCHES,
+  },
+  typography: {
+    anchor: "foundation-typography",
+    heading: "Typography",
+    viz: "type-specimen",
+    tokenCategory: "typography",
+    tokenRows: TOKEN_ROWS,
+    families: TYPE_FAMILIES,
+    scale: TYPE_SCALE,
+  },
+  spacing: {
+    anchor: "foundation-spacing",
+    heading: "Spacing",
+    viz: "spacing-viz",
+    tokenCategory: "spacing",
+    tokenRows: TOKEN_ROWS,
+    steps: SPACING_STEPS,
+    padTokens: SPACING_PADS,
+  },
+};
+
+const sectionProps = SECTION_PROPS[topic as string];
+---
+
+<BookShell title={title} currentHref={`/foundations/${topic}`}>
+  <h1>{heading}</h1>
+  <FoundationSection {...(sectionProps as any)} />
+</BookShell>

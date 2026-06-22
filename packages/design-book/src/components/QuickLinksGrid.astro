@@ -1,0 +1,86 @@
+---
+import type { QuickLink } from "../data/play.js";
+
+/**
+ * QuickLinksGrid — the Home-page orientation jumpboard.
+ *
+ * A grid of plain <a> destination cards. Calm editorial visual (OI-DC-008):
+ * bg-surface fill + a single border-top hairline ONLY — no side/bottom borders,
+ * no shadow, no radius. Hover swaps the border-top to accent-1. Each card is a
+ * ≥44px keyboard-operable link.
+ */
+interface Props {
+  links: QuickLink[];
+}
+
+const { links } = Astro.props;
+---
+
+<ul class="dk-quicklinks" role="list">
+  {links.map((link) => (
+    <li>
+      <a class="dk-quicklink" href={link.href}>
+        {link.eyebrow && <span class="dk-quicklink__eyebrow">{link.eyebrow}</span>}
+        <span class="dk-quicklink__label">{link.label}</span>
+        {link.description && <span class="dk-quicklink__desc">{link.description}</span>}
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .dk-quicklinks {
+    list-style: none;
+    margin: var(--dk-space-8) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--dk-space-4);
+  }
+
+  @media (min-width: 768px) {
+    .dk-quicklinks {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+  }
+
+  .dk-quicklink {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dk-space-2);
+    min-height: 44px;
+    padding: var(--dk-space-5) var(--dk-space-4);
+    background: var(--dk-color-bg-surface);
+    /* border-top hairline ONLY — no side/bottom borders, no shadow, no radius. */
+    border-top: 1px solid var(--dk-color-border);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .dk-quicklink:hover {
+    border-top-color: var(--dk-color-accent-1);
+  }
+
+  .dk-quicklink:focus-visible {
+    outline: 2px solid var(--dk-color-accent-1);
+    outline-offset: 2px;
+  }
+
+  .dk-quicklink__eyebrow {
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    letter-spacing: var(--dk-type-ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--dk-color-fg-secondary);
+  }
+
+  .dk-quicklink__label {
+    font-family: var(--dk-type-family-body);
+    color: var(--dk-color-fg-primary);
+  }
+
+  .dk-quicklink__desc {
+    font-size: var(--dk-type-scale-caption);
+    color: var(--dk-color-fg-secondary);
+  }
+</style>

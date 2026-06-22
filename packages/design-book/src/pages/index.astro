@@ -1,0 +1,59 @@
+---
+import BookShell from "../components/BookShell.astro";
+import QuickLinksGrid from "../components/QuickLinksGrid.astro";
+import { STORIES } from "../data/design-book.js";
+import type { QuickLink } from "../data/play.js";
+
+/**
+ * / — the Home orientation page.
+ *
+ * Replaces the old wall-of-scroll landing. Cover headline/subheadline come from
+ * the STORIES 'cover' story (obs-2633: extracted in frontmatter). The page owns
+ * its <h1>; BookShell renders the persistent sidebar. No PrimitiveStage, no long
+ * sections, no fixtures glob — those live on their own routes / in BookShell.
+ */
+const cover = STORIES.find((s) => s.id === "cover")?.props ?? {};
+const coverProps = cover as Record<string, unknown>;
+
+const QUICK_LINKS: QuickLink[] = [
+  {
+    eyebrow: "01",
+    label: "Foundations",
+    href: "/foundations/color",
+    description: "Color, Typography, Spacing tokens",
+  },
+  {
+    eyebrow: "02",
+    label: "Primitives",
+    href: "/component/hero",
+    description: "Hero · Two-Up · Code · Quote",
+  },
+  {
+    eyebrow: "03",
+    label: "Themes",
+    href: "/themes",
+    description: "Swap the theme, keep the deck",
+  },
+  {
+    eyebrow: "04",
+    label: "The Rule",
+    href: "/rule",
+    description: "One rule that keeps the layout brain honest",
+  },
+  {
+    label: "Deck Demo",
+    href: "/demo",
+    description: "See the whole book as a slide deck →",
+  },
+];
+---
+
+<BookShell
+  title="DeckLee Design Book"
+  description="A locked set of layouts, a three-layer token system, and one rule."
+  currentHref="/"
+>
+  <h1>{String(coverProps.headline ?? "DeckLee Design Book")}</h1>
+  {coverProps.subheadline && <p>{String(coverProps.subheadline)}</p>}
+  <QuickLinksGrid links={QUICK_LINKS} />
+</BookShell>

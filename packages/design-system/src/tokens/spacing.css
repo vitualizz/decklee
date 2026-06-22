@@ -1,0 +1,21 @@
+/**
+ * Spacing tokens — 4px base step at the 1920px authoring frame.
+ * NO vw/vh, NO @media.
+ */
+:root {
+  --dk-space-1: 4px;
+  --dk-space-2: 8px;
+  --dk-space-3: 12px;
+  --dk-space-4: 16px;
+  --dk-space-5: 20px;
+  --dk-space-6: 24px;
+  --dk-space-7: 28px;
+  --dk-space-8: 32px;
+  --dk-space-9: 36px;
+  --dk-space-10: 40px;
+  --dk-space-11: 44px;
+  --dk-space-12: 48px;
+
+  --dk-space-slide-pad-x: 96px;
+  --dk-space-slide-pad-y: 72px;
+}

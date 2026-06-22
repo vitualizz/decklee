@@ -1,0 +1,53 @@
+---
+/**
+ * StaticStackedFallback — the `.slides` container that holds the baked
+ * <section data-id> stack. This IS the Reveal baseline AND the no-JS fallback:
+ * one render path. The page (index.astro) slots one <section> per story into it
+ * (each wrapping a live primitive + inline <details> book-chrome). Reveal
+ * progressively enhances this exact DOM at client load.
+ */
+---
+
+<div class="slides">
+  <slot />
+</div>
+
+<style is:global>
+  /* Stacked baseline (pre-enhancement / no-JS): readable vertical document.
+     Reveal overrides .slides positioning once it initializes. */
+  .reveal:not(.ready) .slides > section[data-id] {
+    display: block;
+  }
+
+  .dk-stack-section {
+    border-bottom: 1px solid var(--dk-color-border);
+  }
+
+  .dk-stack-section__heading {
+    margin: 0;
+    padding: var(--dk-space-4) var(--dk-space-slide-pad-x);
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    letter-spacing: var(--dk-type-ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--dk-color-fg-muted);
+  }
+
+  .dk-stack-section__disclosure {
+    padding: var(--dk-space-4) var(--dk-space-slide-pad-x);
+    color: var(--dk-color-fg-secondary);
+    font-family: var(--dk-type-family-body);
+    font-size: var(--dk-type-scale-caption);
+  }
+
+  .dk-stack-section__disclosure summary {
+    cursor: pointer;
+    color: var(--dk-color-fg-muted);
+    font-family: var(--dk-type-family-code);
+    text-transform: uppercase;
+    letter-spacing: var(--dk-type-ls-eyebrow);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+</style>

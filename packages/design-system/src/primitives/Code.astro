@@ -1,0 +1,67 @@
+---
+import type { CodeProps } from "@decklee/schema";
+import { highlight, wrapLines } from "../highlight.js";
+
+type Props = CodeProps & { theme_id: string };
+
+const { code, language, heading, highlight_lines, caption, theme_id } =
+  Astro.props;
+
+void theme_id;
+
+const tokenized = highlight(code, language);
+const wrapped = wrapLines(tokenized, highlight_lines ?? []);
+
+const CAPTION_ID = "dk-code-cap";
+---
+
+<section class="dk-code" data-layout="code">
+  {heading && <h2 class="dk-code__heading">{heading}</h2>}
+  <pre class="dk-code__pre" aria-describedby={caption ? CAPTION_ID : undefined}>
+    <code class="hljs dk-code__code" data-lang={language} set:html={wrapped} />
+  </pre>
+  {caption && <p class="dk-code__caption" id={CAPTION_ID}>{caption}</p>}
+</section>
+
+<style>
+  .dk-code {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dk-space-5);
+    padding: var(--dk-space-slide-pad-y) var(--dk-space-slide-pad-x);
+    background-color: var(--dk-color-bg-base);
+    color: var(--dk-color-fg-primary);
+  }
+
+  .dk-code__heading {
+    margin: 0;
+    font-family: var(--dk-type-family-display);
+    font-size: var(--dk-type-scale-h2);
+    font-weight: var(--dk-type-weight-bold);
+    line-height: var(--dk-type-lh-base);
+    letter-spacing: var(--dk-type-ls-display);
+    color: var(--dk-color-fg-primary);
+  }
+
+  .dk-code__pre {
+    margin: 0;
+    padding: var(--dk-space-8);
+    border-radius: var(--dk-space-3);
+    background-color: var(--dk-color-bg-surface);
+    overflow: auto;
+  }
+
+  .dk-code__code {
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-code);
+    line-height: var(--dk-type-lh-base);
+    color: var(--dk-color-fg-primary);
+  }
+
+  .dk-code__caption {
+    margin: 0;
+    font-family: var(--dk-type-family-body);
+    font-size: var(--dk-type-scale-caption);
+    color: var(--dk-color-fg-muted);
+  }
+</style>

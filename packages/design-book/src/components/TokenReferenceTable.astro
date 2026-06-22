@@ -1,0 +1,78 @@
+---
+import type { TokenRow } from "../scripts/generate-token-data.js";
+
+interface Props {
+  category: "color" | "typography" | "spacing";
+  rows: TokenRow[];
+}
+
+const { category, rows } = Astro.props;
+const captionLabel = category.charAt(0).toUpperCase() + category.slice(1);
+// Theme keys are forward-compatible (EXT-03): one column per theme_id.
+const themeKeys = Array.from(
+  new Set(rows.flatMap((r) => Object.keys(r.themes))),
+);
+---
+
+<table class="dk-token-table">
+  <caption class="dk-token-table__caption">{captionLabel} Token Reference</caption>
+  <thead>
+    <tr>
+      <th scope="col">Token</th>
+      <th scope="col">Value (oklch)</th>
+      {themeKeys.map((k) => (
+        <th scope="col">{k} (rgb)</th>
+      ))}
+      <th scope="col">Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    {rows.map((row) => (
+      <tr>
+        <td><code>{row.name}</code></td>
+        <td><code>{row.oklch}</code></td>
+        {themeKeys.map((k) => (
+          <td><code>{row.themes[k] ?? "—"}</code></td>
+        ))}
+        <td>{row.role}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+<style>
+  .dk-token-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    color: var(--dk-color-fg-primary);
+    background: var(--dk-color-bg-surface);
+  }
+
+  .dk-token-table__caption {
+    text-align: left;
+    padding: var(--dk-space-3) var(--dk-space-4);
+    color: var(--dk-color-fg-muted);
+    letter-spacing: var(--dk-type-ls-eyebrow);
+    text-transform: uppercase;
+  }
+
+  .dk-token-table th,
+  .dk-token-table td {
+    padding: var(--dk-space-3) var(--dk-space-4);
+    border-bottom: 1px solid var(--dk-color-border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .dk-token-table th {
+    color: var(--dk-color-fg-muted);
+    font-weight: var(--dk-type-weight-bold);
+  }
+
+  .dk-token-table td:last-child {
+    color: var(--dk-color-fg-secondary);
+    font-family: var(--dk-type-family-body);
+  }
+</style>

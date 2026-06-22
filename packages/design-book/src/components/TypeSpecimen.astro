@@ -1,0 +1,91 @@
+---
+import type { TypeFamily, TypeScaleSpecimen } from "../scripts/generate-token-data.js";
+
+interface Props {
+  families: TypeFamily[];
+  scale: TypeScaleSpecimen[];
+}
+
+const { families, scale } = Astro.props;
+---
+
+<div class="dk-specimen" role="presentation">
+  <ul class="dk-specimen__families" role="list">
+    {families.map((f) => (
+      <li class="dk-specimen__family" style={`font-family:var(${f.token});`}>
+        <span class="dk-specimen__sample">Ag</span>
+        <span class="dk-specimen__label">{f.token} — {f.role}</span>
+      </li>
+    ))}
+  </ul>
+  <ul class="dk-specimen__scale" role="list">
+    {scale.map((s) => (
+      <li class="dk-specimen__step">
+        <p
+          class="dk-specimen__text"
+          style={`font-size:var(${s.token});`}
+          aria-label={`${s.token}: ${s.sizePx}px`}
+        >
+          {s.label} {s.sizePx}px
+        </p>
+        <span class="dk-specimen__label">{s.token}</span>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  /* INSIDE the 1920x1080 canvas — fixed px only, NO vw/vh, NO @media. */
+  .dk-specimen {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 48px;
+    padding: 72px 96px;
+    background-color: var(--dk-color-bg-base);
+    color: var(--dk-color-fg-primary);
+  }
+
+  .dk-specimen__families,
+  .dk-specimen__scale {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .dk-specimen__family {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dk-specimen__sample {
+    font-size: 76px;
+    font-weight: var(--dk-type-weight-bold);
+    line-height: var(--dk-type-lh-tight);
+  }
+
+  .dk-specimen__step {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .dk-specimen__text {
+    margin: 0;
+    font-family: var(--dk-type-family-display);
+    font-weight: var(--dk-type-weight-bold);
+    line-height: var(--dk-type-lh-tight);
+    letter-spacing: var(--dk-type-ls-display);
+    color: var(--dk-color-fg-primary);
+  }
+
+  .dk-specimen__label {
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    color: var(--dk-color-fg-muted);
+    letter-spacing: var(--dk-type-ls-eyebrow);
+  }
+</style>

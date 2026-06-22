@@ -1,0 +1,81 @@
+---
+import type { PropTableData } from "../scripts/generate-prop-tables.js";
+
+interface Props {
+  primitive: string;
+  rows: PropTableData["rows"];
+  highlightedProps?: string[];
+}
+
+const { primitive, rows, highlightedProps = [] } = Astro.props;
+const highlighted = new Set(highlightedProps);
+const captionLabel = primitive === "two-up" ? "Two-Up" : primitive.charAt(0).toUpperCase() + primitive.slice(1);
+---
+
+<table class="dk-prop-table">
+  <caption class="dk-prop-table__caption">{captionLabel} — Component API</caption>
+  <thead>
+    <tr>
+      <th scope="col">Prop</th>
+      <th scope="col">Type</th>
+      <th scope="col">Required</th>
+      <th scope="col">Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {rows.map((row) => (
+      <tr
+        class:list={["dk-prop-row", { "dk-prop-row--on": highlighted.has(row.prop) }]}
+        aria-selected={highlighted.has(row.prop) ? "true" : undefined}
+      >
+        <td><code>{row.prop}</code></td>
+        <td><code>{row.type}</code></td>
+        <td>{row.required ? "Yes" : "No"}</td>
+        <td>{row.notes}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+<style>
+  .dk-prop-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    color: var(--dk-color-fg-primary);
+    background: var(--dk-color-bg-surface);
+  }
+
+  .dk-prop-table__caption {
+    text-align: left;
+    padding: var(--dk-space-3) var(--dk-space-4);
+    color: var(--dk-color-fg-muted);
+    letter-spacing: var(--dk-type-ls-eyebrow);
+    text-transform: uppercase;
+  }
+
+  .dk-prop-table th,
+  .dk-prop-table td {
+    padding: var(--dk-space-3) var(--dk-space-4);
+    border-bottom: 1px solid var(--dk-color-border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .dk-prop-table th {
+    color: var(--dk-color-fg-muted);
+    font-weight: var(--dk-type-weight-bold);
+  }
+
+  .dk-prop-table td:last-child {
+    color: var(--dk-color-fg-secondary);
+    font-family: var(--dk-type-family-body);
+  }
+
+  /* Dual signal: accent border + bold (never color alone). */
+  .dk-prop-row--on {
+    border-left: 2px solid var(--dk-color-accent-1);
+    font-weight: var(--dk-type-weight-bold);
+  }
+</style>

@@ -1,0 +1,116 @@
+---
+import PrimitiveStage from "./PrimitiveStage.astro";
+import ColorSwatchGrid from "./ColorSwatchGrid.astro";
+import TypeSpecimen from "./TypeSpecimen.astro";
+import SpacingScaleViz from "./SpacingScaleViz.astro";
+import TokenReferenceTable from "./TokenReferenceTable.astro";
+import type {
+  ColorSwatch,
+  TokenRow,
+  TypeFamily,
+  TypeScaleSpecimen,
+  SpacingStep,
+  SpacingPad,
+} from "../scripts/generate-token-data.js";
+
+/**
+ * FoundationSection — one foundation sub-grouping (Color, Typography, Spacing)
+ * inside §01. Renders an h3 (the parent LandingSection owns the h2) with the
+ * viz on the left and a TokenReferenceTable on the right.
+ *
+ * The TokenReferenceTable is ALWAYS in normal document flow, never inside a
+ * PrimitiveStage scale transform (WCAG 1.4.4 — it's the readable content).
+ * ColorSwatchGrid self-scales (auto-fill grid) so it is NOT staged; the
+ * fixed-px TypeSpecimen and SpacingScaleViz ARE staged. All viz routing is
+ * resolved in frontmatter (obs 2633).
+ */
+type Viz = "color-swatches" | "type-specimen" | "spacing-viz";
+type TokenCategory = "color" | "typography" | "spacing";
+
+interface Props {
+  anchor: string;
+  heading: string;
+  viz: Viz;
+  tokenCategory: TokenCategory;
+  tokenRows: TokenRow[];
+  swatches?: ColorSwatch[];
+  families?: TypeFamily[];
+  scale?: TypeScaleSpecimen[];
+  steps?: SpacingStep[];
+  padTokens?: SpacingPad[];
+}
+
+const {
+  anchor,
+  heading,
+  viz,
+  tokenCategory,
+  tokenRows,
+  swatches = [],
+  families = [],
+  scale = [],
+  steps = [],
+  padTokens = [],
+} = Astro.props;
+---
+
+<div class="dk-foundation" id={anchor}>
+  <h3 class="dk-foundation__heading" tabindex="-1">{heading}</h3>
+  <div class="dk-foundation__grid">
+    <div class="dk-foundation__viz">
+      {viz === "color-swatches" && <ColorSwatchGrid swatches={swatches} />}
+      {viz === "type-specimen" && (
+        <PrimitiveStage label={`Specimen: ${heading}`}>
+          <TypeSpecimen families={families} scale={scale} />
+        </PrimitiveStage>
+      )}
+      {viz === "spacing-viz" && (
+        <PrimitiveStage label={`Specimen: ${heading}`}>
+          <SpacingScaleViz steps={steps} padTokens={padTokens} />
+        </PrimitiveStage>
+      )}
+    </div>
+    <div class="dk-foundation__docs">
+      <TokenReferenceTable category={tokenCategory} rows={tokenRows} />
+    </div>
+  </div>
+</div>
+
+<style>
+  .dk-foundation {
+    /* ≥96px sub-grouping gap = 2 × --dk-space-12 (48px). */
+    padding-block-start: calc(2 * var(--dk-space-12));
+  }
+
+  .dk-foundation__heading {
+    margin: 0 0 var(--dk-space-6);
+    font-family: var(--dk-type-family-display);
+    font-weight: var(--dk-type-weight-bold);
+    line-height: var(--dk-type-lh-tight);
+    color: var(--dk-color-fg-primary);
+    font-size: clamp(20px, 2.5vw, 36px);
+  }
+
+  .dk-foundation__heading:focus-visible {
+    outline: 2px solid var(--dk-color-accent-1);
+    outline-offset: 2px;
+  }
+
+  .dk-foundation__grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dk-space-8);
+  }
+
+  @media (min-width: 1024px) {
+    .dk-foundation__grid {
+      display: grid;
+      grid-template-columns: 55% 45%;
+      align-items: start;
+    }
+  }
+
+  .dk-foundation__docs {
+    overflow-x: auto;
+  }
+</style>

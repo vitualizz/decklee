@@ -1,0 +1,26 @@
+/**
+ * Color tokens — value-neutral baseline.
+ *
+ * Declares EVERY --dk-color-* custom property at :root with legible dark
+ * placeholder values so an unthemed render is still readable. Theme layers
+ * (e.g. themes/dev/dev.css) override these under a [data-theme="..."] scope
+ * and own the rgb()-before-oklch() cascade fallbacks.
+ *
+ * NO concrete rgb/hex here, NO vw/vh, NO @media.
+ */
+:root {
+  --dk-color-bg-base: oklch(10% 0 0);
+  --dk-color-bg-surface: oklch(14% 0 0);
+  --dk-color-fg-primary: oklch(97% 0 0);
+  --dk-color-fg-secondary: oklch(90% 0 0);
+  --dk-color-fg-muted: oklch(68% 0 0);
+  --dk-color-accent-1: oklch(74% 0.145 245);
+  --dk-color-accent-2: oklch(76% 0.145 155);
+  --dk-color-border: oklch(100% 0 0 / 8%);
+  --dk-color-overlay-bg: oklch(10% 0 0 / 90%);
+
+  /* Syntax aliases — resolve to accent/fg tokens so highlight color follows the theme. */
+  --dk-color-syntax-keyword: var(--dk-color-accent-1);
+  --dk-color-syntax-string: var(--dk-color-accent-2);
+  --dk-color-syntax-comment: var(--dk-color-fg-secondary);
+}

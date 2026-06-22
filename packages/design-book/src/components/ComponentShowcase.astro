@@ -1,0 +1,148 @@
+---
+import PrimitiveStage from "./PrimitiveStage.astro";
+import PropApiTable from "./PropApiTable.astro";
+import type { PlayVariant } from "../data/play.js";
+import type { PropTableData } from "../scripts/generate-prop-tables.js";
+
+/**
+ * ComponentShowcase — one primitive's full variant stack.
+ *
+ * Renders the primitive name as an h2 (clamp 22–40, smaller than the section
+ * opener h2 — the dual-h2 differentiator), then each variant as an h3 with a
+ * bounded PrimitiveStage live preview beside its PropApiTable. The table sits
+ * OUTSIDE the stage scale transform (WCAG 1.4.4 reflow). A hairline <hr> +
+ * ≥72px gap breathes between variants (CALM).
+ *
+ * GOTCHA (obs 2633): the `component` factory is selected/typed in the PARENT
+ * (index.astro) frontmatter and passed in here. The dynamic render uses
+ * `{...props as any}` because the 4-primitive union can't be statically
+ * narrowed; per-variant prep stays in this file's frontmatter.
+ */
+interface Props {
+  anchor: string;
+  name: string;
+  component: any; // AstroComponentFactory — selected in parent frontmatter
+  primitive: string;
+  variants: PlayVariant[];
+  propRows: PropTableData["rows"];
+  focusHref?: string;
+}
+
+const { anchor, name, component, primitive, variants, propRows, focusHref } = Astro.props;
+const Comp = component;
+
+// Per-variant prep — keep all typed/casted logic in frontmatter.
+const prepared = variants.map((variant) => {
+  const props = variant.props as Record<string, unknown>;
+  const { theme_id, ...contentProps } = props;
+  void theme_id;
+  return {
+    variantId: `${anchor}-${variant.name}`,
+    label: variant.name,
+    props: props as any,
+    highlightedProps: Object.keys(contentProps),
+    fallbackJson: JSON.stringify(contentProps, null, 2),
+  };
+});
+---
+
+<div class="dk-showcase">
+  <h2 id={anchor} class="dk-showcase__name" tabindex="-1">{name}</h2>
+
+  {focusHref && (
+    <a class="dk-showcase__focus-link" href={focusHref}>Open / focus →</a>
+  )}
+
+  {prepared.map(({ variantId, label, props, highlightedProps, fallbackJson }, i) => (
+    <div class="dk-showcase__variant" id={variantId}>
+      {i > 0 && <hr class="dk-showcase__rule" aria-hidden="true" />}
+      <h3 class="dk-showcase__variant-name">{label}</h3>
+      <div class="dk-showcase__grid">
+        <div class="dk-showcase__preview">
+          {Comp ? (
+            <PrimitiveStage label={`Live preview: ${name} — ${label}`}>
+              <Comp {...props} />
+            </PrimitiveStage>
+          ) : (
+            <pre class="dk-showcase__fallback">{fallbackJson}</pre>
+          )}
+        </div>
+        <div class="dk-showcase__docs">
+          <PropApiTable
+            primitive={primitive}
+            rows={propRows}
+            highlightedProps={highlightedProps}
+          />
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .dk-showcase__name {
+    margin: 0 0 var(--dk-space-6);
+    font-family: var(--dk-type-family-display);
+    font-weight: var(--dk-type-weight-bold);
+    line-height: var(--dk-type-lh-tight);
+    letter-spacing: var(--dk-type-ls-display);
+    color: var(--dk-color-fg-primary);
+    /* Smaller than the section opener h2 (clamp 28–64) — the dual-h2 tier. */
+    font-size: clamp(22px, 3vw, 40px);
+  }
+
+  .dk-showcase__name:focus-visible {
+    outline: 2px solid var(--dk-color-accent-1);
+    outline-offset: 2px;
+  }
+
+  .dk-showcase__variant {
+    /* ≥72px breath between variant blocks. */
+    padding-block-start: var(--dk-space-slide-pad-y);
+  }
+
+  .dk-showcase__rule {
+    border: 0;
+    border-top: 1px solid var(--dk-color-border);
+    margin: 0 0 var(--dk-space-slide-pad-y);
+  }
+
+  .dk-showcase__variant-name {
+    margin: 0 0 var(--dk-space-5);
+    font-family: var(--dk-type-family-display);
+    font-weight: var(--dk-type-weight-bold);
+    line-height: var(--dk-type-lh-tight);
+    color: var(--dk-color-fg-primary);
+    font-size: clamp(20px, 2.5vw, 36px);
+  }
+
+  .dk-showcase__grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dk-space-8);
+  }
+
+  /* lg+: 55 / 45 two-column. */
+  @media (min-width: 1024px) {
+    .dk-showcase__grid {
+      display: grid;
+      grid-template-columns: 55% 45%;
+      align-items: start;
+    }
+  }
+
+  .dk-showcase__fallback {
+    margin: 0;
+    padding: var(--dk-space-4);
+    overflow: auto;
+    background: var(--dk-color-bg-surface);
+    border: 1px solid var(--dk-color-border);
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    color: var(--dk-color-fg-secondary);
+  }
+
+  .dk-showcase__docs {
+    overflow-x: auto;
+  }
+</style>

@@ -1,0 +1,265 @@
+---
+import type { SectionNavItem, LandingNavItem } from "../data/design-book.js";
+import type { NavGroup } from "../data/play.js";
+
+/**
+ * SectionRail — the left-rail table of contents.
+ *
+ * Two modes (discriminated on navMode):
+ *  - 'slide-jump' (default): renders <button data-first-slide-index> exactly as
+ *    before — BookLayout's reveal boot wires the clicks. Zero /demo regression.
+ *  - 'anchor': renders <a href="#anchor"> for the scroll landing page. Native
+ *    keyboard + no-JS safe; reuses the same .dk-rail__btn styling.
+ *
+ * All typed branching stays in frontmatter; the template only checks the
+ * resolved `mode` string (Astro mis-reads TS generics in {...} expressions).
+ */
+type Props =
+  | { navMode?: "slide-jump"; sections: SectionNavItem[]; initialActive: string }
+  | { navMode: "anchor"; items: LandingNavItem[]; initialActive?: string }
+  | { navMode: "tree"; groups: NavGroup[]; currentHref: string };
+
+const props = Astro.props as Props;
+const mode = props.navMode ?? "slide-jump";
+
+const sections = mode === "slide-jump" ? (props as { sections: SectionNavItem[] }).sections : [];
+const items = mode === "anchor" ? (props as { items: LandingNavItem[] }).items : [];
+const initialActive = mode === "tree" ? "" : (props as { initialActive?: string }).initialActive ?? "";
+
+// Tree mode: build-time-resolved groups + active-href. obs-2633: the open-flag
+// computation lives here, never in the template.
+const treeGroups = mode === "tree" ? (props as { groups: NavGroup[] }).groups : [];
+const currentHref = mode === "tree" ? (props as { currentHref: string }).currentHref : "";
+const groupsWithOpen = treeGroups.map((g) => ({
+  ...g,
+  _open:
+    g.label === "Foundations" ||
+    (g.label === "Primitives" && g.children.length < 10) ||
+    g.children.some((leaf) => leaf.href === currentHref),
+}));
+---
+
+{mode === "tree" ? (
+  <ul class="dk-rail dk-rail--tree" role="list">
+    {groupsWithOpen.map((g) =>
+      g.external || (g.children.length === 0 && g.href) ? (
+        <li>
+          <a
+            class={g.external ? "dk-rail__btn dk-rail__btn--external" : "dk-rail__btn"}
+            href={g.href}
+            aria-current={g.href === currentHref ? "page" : undefined}
+          >
+            {g.label}
+          </a>
+        </li>
+      ) : (
+        <li>
+          <details open={g._open || undefined}>
+            <summary class="dk-rail__group-label">{g.label}</summary>
+            <ul role="list">
+              {g.children.length === 0 ? (
+                <li class="dk-rail__empty-state">No drafts in progress.</li>
+              ) : (
+                g.children.map((leaf) => (
+                  <li>
+                    <a
+                      class="dk-rail__btn"
+                      href={leaf.href}
+                      aria-current={leaf.href === currentHref ? "page" : undefined}
+                    >
+                      {leaf.label}
+                    </a>
+                  </li>
+                ))
+              )}
+            </ul>
+          </details>
+        </li>
+      ),
+    )}
+  </ul>
+) : (
+<ul class="dk-rail" role="list">
+  {mode === "anchor"
+    ? items.map((item) => (
+        <li class="dk-rail__item">
+          <a
+            class="dk-rail__btn"
+            href={`#${item.anchor}`}
+            data-anchor-target={item.anchor}
+            aria-current={item.id === initialActive ? "page" : undefined}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))
+    : sections.map((s) => (
+        <li class="dk-rail__item">
+          <button
+            type="button"
+            class="dk-rail__btn"
+            data-first-slide-index={s.firstSlideIndex}
+            data-section-id={s.id}
+            aria-current={s.id === initialActive ? "page" : undefined}
+          >
+            {s.label}
+          </button>
+        </li>
+      ))}
+</ul>
+)}
+
+{mode === "anchor" && (
+  <script is:inline>
+    // Progressive enhancement: mirror scroll position onto aria-current.
+    // Anchors work natively without this.
+    (() => {
+      const links = Array.from(document.querySelectorAll("a.dk-rail__btn[data-anchor-target]"));
+      if (links.length === 0 || !("IntersectionObserver" in window)) return;
+      const byAnchor = new Map();
+      links.forEach((a) => byAnchor.set(a.getAttribute("data-anchor-target"), a));
+      const setCurrent = (anchor) => {
+        links.forEach((a) => {
+          if (a.getAttribute("data-anchor-target") === anchor) {
+            a.setAttribute("aria-current", "page");
+          } else {
+            a.removeAttribute("aria-current");
+          }
+        });
+      };
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.target.id) setCurrent(entry.target.id);
+          });
+        },
+        { rootMargin: "-40% 0px -55% 0px" },
+      );
+      byAnchor.forEach((_link, anchor) => {
+        const target = document.getElementById(anchor);
+        if (target) io.observe(target);
+      });
+    })();
+  </script>
+)}
+
+<style>
+  .dk-rail {
+    list-style: none;
+    margin: 0;
+    padding: var(--dk-space-4) var(--dk-space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--dk-space-2);
+  }
+
+  .dk-rail__item {
+    margin: 0;
+  }
+
+  .dk-rail__btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+    padding: var(--dk-space-3) var(--dk-space-4);
+    border: 0;
+    background: transparent;
+    color: var(--dk-color-fg-muted);
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    letter-spacing: var(--dk-type-ls-eyebrow);
+    text-transform: uppercase;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .dk-rail__btn:hover {
+    color: var(--dk-color-fg-primary);
+    text-decoration: underline;
+    text-decoration-color: var(--dk-color-accent-1);
+  }
+
+  .dk-rail__btn:focus-visible {
+    outline: 2px solid var(--dk-color-accent-1);
+    outline-offset: 2px;
+  }
+
+  .dk-rail__btn[aria-current="page"] {
+    color: var(--dk-color-accent-1);
+    font-weight: var(--dk-type-weight-bold);
+  }
+
+  /* Mobile: horizontal bottom strip — slide-jump/anchor modes ONLY (TR-5). */
+  @media (max-width: 767px) {
+    .dk-rail:not(.dk-rail--tree) {
+      flex-direction: row;
+      overflow-x: auto;
+      padding: var(--dk-space-2);
+    }
+    .dk-rail:not(.dk-rail--tree) .dk-rail__btn {
+      white-space: nowrap;
+    }
+  }
+
+  /* ── Tree mode — always vertical, used by BookShell sidebar. */
+  .dk-rail--tree {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: var(--dk-space-2) 0;
+  }
+
+  .dk-rail--tree li {
+    list-style: none;
+  }
+
+  .dk-rail--tree ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Group label: editorial eyebrow, non-interactive. Hairline above each group. */
+  .dk-rail__group-label {
+    display: block;
+    padding: var(--dk-space-3) var(--dk-space-4) var(--dk-space-2);
+    border-top: 1px solid var(--dk-color-border);
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    letter-spacing: var(--dk-type-ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--dk-color-fg-secondary);
+    cursor: default;
+    list-style: none;
+  }
+
+  .dk-rail__group-label::-webkit-details-marker {
+    display: none;
+  }
+
+  summary.dk-rail__group-label {
+    list-style: none;
+  }
+
+  /* Child leaf indent — clear group→leaf hierarchy step (20px). */
+  .dk-rail--tree details ul .dk-rail__btn {
+    padding-inline-start: calc(var(--dk-space-4) + var(--dk-space-1));
+  }
+
+  /* External 'See it live →' leaf: divider above only; color stays standard leaf. */
+  .dk-rail__btn--external {
+    border-top: 1px solid var(--dk-color-border);
+    margin-block-start: var(--dk-space-2);
+  }
+
+  /* Empty Drafts group. */
+  .dk-rail__empty-state {
+    padding: var(--dk-space-3) var(--dk-space-4);
+    color: var(--dk-color-fg-muted);
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    list-style: none;
+  }
+</style>

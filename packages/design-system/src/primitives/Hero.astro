@@ -1,0 +1,91 @@
+---
+import type { HeroProps } from "@decklee/schema";
+
+type Props = HeroProps & { theme_id: string };
+
+const {
+  headline,
+  subheadline,
+  eyebrow,
+  background_treatment = "color",
+  image_src,
+  image_alt,
+  cta_label,
+  theme_id,
+} = Astro.props;
+
+// theme_id is part of the primitive contract handshake but is not rendered:
+// the viewer sets [data-theme] on the deck root. Void-reference to keep the
+// interface honest without an unused-var lint.
+void theme_id;
+
+const showBackgroundImage = background_treatment === "image" && Boolean(image_src);
+---
+
+<section class="dk-hero" data-layout="hero">
+  {eyebrow && <p class="dk-hero__eyebrow">{eyebrow}</p>}
+  <h1 class="dk-hero__headline">{headline}</h1>
+  {subheadline && <p class="dk-hero__subheadline">{subheadline}</p>}
+  {cta_label && <p class="dk-hero__cta">{cta_label}</p>}
+  {showBackgroundImage && (
+    <img class="dk-hero__bg" src={image_src} alt={image_alt ?? ""} />
+  )}
+</section>
+
+<style>
+  .dk-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--dk-space-6);
+    padding: var(--dk-space-slide-pad-y) var(--dk-space-slide-pad-x);
+    background-color: var(--dk-color-bg-base);
+    color: var(--dk-color-fg-primary);
+  }
+
+  .dk-hero__eyebrow {
+    margin: 0;
+    font-family: var(--dk-type-family-body);
+    font-size: var(--dk-type-scale-caption);
+    font-weight: var(--dk-type-weight-bold);
+    letter-spacing: var(--dk-type-ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--dk-color-accent-1);
+  }
+
+  .dk-hero__headline {
+    margin: 0;
+    font-family: var(--dk-type-family-display);
+    font-size: var(--dk-type-scale-hero);
+    font-weight: var(--dk-type-weight-bold);
+    line-height: var(--dk-type-lh-tight);
+    letter-spacing: var(--dk-type-ls-display);
+    color: var(--dk-color-fg-primary);
+  }
+
+  .dk-hero__subheadline {
+    margin: 0;
+    font-family: var(--dk-type-family-body);
+    font-size: var(--dk-type-scale-body);
+    line-height: var(--dk-type-lh-relaxed);
+    color: var(--dk-color-fg-secondary);
+  }
+
+  .dk-hero__cta {
+    margin: 0;
+    font-family: var(--dk-type-family-body);
+    font-size: var(--dk-type-scale-body);
+    font-weight: var(--dk-type-weight-bold);
+    color: var(--dk-color-accent-2);
+  }
+
+  .dk-hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+  }
+</style>

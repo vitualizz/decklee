@@ -1,0 +1,29 @@
+/**
+ * Typography tokens — fixed px at the 1920px authoring frame.
+ *
+ * Families reference web-font names with web-safe fallback stacks; the font
+ * binary is loaded by the host, not embedded here. NO @import, NO vw/vh,
+ * NO @media.
+ */
+:root {
+  --dk-type-family-display: "Space Grotesk", system-ui, sans-serif;
+  --dk-type-family-body: "Instrument Sans", system-ui, sans-serif;
+  --dk-type-family-code: "JetBrains Mono", "Courier New", monospace;
+
+  --dk-type-scale-hero: 108px;
+  --dk-type-scale-h1: 76px;
+  --dk-type-scale-h2: 58px;
+  --dk-type-scale-body: 28px;
+  --dk-type-scale-caption: 21px;
+  --dk-type-scale-code: 24px;
+
+  --dk-type-weight-bold: 600;
+  --dk-type-weight-regular: 400;
+
+  --dk-type-lh-tight: 1;
+  --dk-type-lh-base: 1.3;
+  --dk-type-lh-relaxed: 1.5;
+
+  --dk-type-ls-display: -0.025em;
+  --dk-type-ls-eyebrow: 0.15em;
+}

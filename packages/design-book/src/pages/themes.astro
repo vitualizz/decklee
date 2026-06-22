@@ -1,0 +1,92 @@
+---
+import Code from "@decklee/design-system/primitives/Code.astro";
+
+import BookShell from "../components/BookShell.astro";
+import LandingSection from "../components/LandingSection.astro";
+import PrimitiveStage from "../components/PrimitiveStage.astro";
+import ThemeContributorBlock from "../components/ThemeContributorBlock.astro";
+
+import { STORIES } from "../data/design-book.js";
+
+/**
+ * /themes — the §03 Themes content, split out of the old single-page index.
+ *
+ * THEME_STEPS / THEME_CHECKLIST were inline in index.astro (never exported from
+ * design-book.ts), so they move here verbatim (OI-SPEC-003). Page owns its <h1>.
+ */
+const THEME_CHECKLIST = [
+  { label: "Override every --dk-color-* role", detail: "bg, fg, accents, border, overlay" },
+  { label: "Override the three type families", detail: "--dk-type-family-*" },
+  { label: "Ship the rgb()-before-oklch() cascade", detail: "rgb() line, then oklch()" },
+  { label: "Register a theme_id", detail: "THEME_REGISTRY" },
+];
+const THEME_STEPS = [
+  { label: "Create the theme file", detail: "src/themes/{id}/{id}.css" },
+  { label: "Register it", detail: "src/themes/index.ts → THEME_REGISTRY" },
+  { label: "Verify against this book", detail: "meta.theme_id = {id}; astro build" },
+];
+
+const themesContributing = STORIES.find((s) => s.id === "themes-contributing");
+const themesContributingProps = themesContributing ? (themesContributing.props as any) : null;
+---
+
+<BookShell title="Themes — Design Book" currentHref="/themes">
+  <h1>Themes</h1>
+  <LandingSection
+    id="themes"
+    eyebrow="03 / Themes"
+    heading="Swap the theme. Keep the deck."
+    subheading="One theme_id at deck.meta — the entire visual identity rebinds, zero component changes."
+  >
+    <div class="dk-landing__col dk-theme-block">
+      <h3 class="dk-theme-block__heading" tabindex="-1">Contributing a theme</h3>
+      <div class="dk-theme-block__grid">
+        {themesContributingProps && (
+          <PrimitiveStage label="Live preview: Code — minimal theme file">
+            <Code {...themesContributingProps} />
+          </PrimitiveStage>
+        )}
+        <ThemeContributorBlock variant="steps" items={THEME_STEPS} />
+      </div>
+    </div>
+
+    <div class="dk-landing__col dk-theme-block">
+      <h3 class="dk-theme-block__heading" tabindex="-1">The theme contract</h3>
+      <ThemeContributorBlock variant="checklist" items={THEME_CHECKLIST} />
+    </div>
+  </LandingSection>
+</BookShell>
+
+<style>
+  .dk-theme-block {
+    padding-block-start: calc(2 * var(--dk-space-12));
+  }
+
+  .dk-theme-block__heading {
+    margin: 0 0 var(--dk-space-6);
+    font-family: var(--dk-type-family-display);
+    font-weight: var(--dk-type-weight-bold);
+    line-height: var(--dk-type-lh-tight);
+    color: var(--dk-color-fg-primary);
+    font-size: clamp(20px, 2.5vw, 36px);
+  }
+
+  .dk-theme-block__heading:focus-visible {
+    outline: 2px solid var(--dk-color-accent-1);
+    outline-offset: 2px;
+  }
+
+  .dk-theme-block__grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dk-space-8);
+  }
+
+  @media (min-width: 1024px) {
+    .dk-theme-block__grid {
+      display: grid;
+      grid-template-columns: 55% 45%;
+      align-items: start;
+    }
+  }
+</style>

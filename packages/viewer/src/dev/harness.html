@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DeckLee Viewer — Dev Harness</title>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"></div>
+    </div>
+
+    <script id="decklee-deck" type="application/json">
+      {
+        "schema_version": "1",
+        "kind": "deck",
+        "id": "dev-deck",
+        "meta": {
+          "title": "Dev Harness Deck",
+          "theme_id": "dev",
+          "source_outline_id": null
+        },
+        "slides": [
+          {
+            "id": "s1",
+            "layout": "hero",
+            "speaker_notes": "Welcome the room.",
+            "content_props": {
+              "eyebrow": "Chapter 1",
+              "headline": "Design Systems at Scale",
+              "subheadline": "Building the primitives right.",
+              "cta_label": "Let's go"
+            }
+          },
+          {
+            "id": "s2",
+            "layout": "two-up",
+            "speaker_notes": null,
+            "content_props": {
+              "left_heading": "Before",
+              "left_body": "The left side story.",
+              "right_heading": "After",
+              "right_body": "The right side story."
+            }
+          },
+          {
+            "id": "s3",
+            "layout": "code",
+            "speaker_notes": null,
+            "content_props": {
+              "language": "typescript",
+              "heading": "A TypeScript Example",
+              "highlight_lines": [1],
+              "caption": "Listing 1 — greeting",
+              "code": "const greeting = 'hello';\nconsole.log(greeting);"
+            }
+          },
+          {
+            "id": "s4",
+            "layout": "quote",
+            "speaker_notes": null,
+            "content_props": {
+              "quote": "Simplicity is the ultimate sophistication.",
+              "attribution": "Leonardo da Vinci",
+              "context": "15th century",
+              "emphasis": "centered"
+            }
+          }
+        ]
+      }
+    </script>
+
+    <script type="module" src="./dev.ts"></script>
+  </body>
+</html>

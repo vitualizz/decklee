@@ -1,0 +1,30 @@
+{
+  "schema_version": "1",
+  "kind": "deck",
+  "id": "deck-starter",
+  "meta": {
+    "title": "My First DeckLee Deck",
+    "theme_id": "dev",
+    "source_outline_id": null
+  },
+  "slides": [
+    {
+      "id": "s1",
+      "layout": "hero",
+      "content_props": {
+        "headline": "Hello, DeckLee",
+        "subheadline": "Edit this file, then run: decklee build deck.json"
+      },
+      "speaker_notes": "Replace this with your own opener."
+    },
+    {
+      "id": "s2",
+      "layout": "quote",
+      "content_props": {
+        "quote": "Describe the content; let the theme do the styling.",
+        "attribution": "DeckLee"
+      },
+      "speaker_notes": null
+    }
+  ]
+}

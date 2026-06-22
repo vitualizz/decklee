@@ -1,0 +1,56 @@
+{
+  "schema_version": "1",
+  "kind": "outline",
+  "id": "outline-better-process",
+  "meta": {
+    "title": "A Better Process",
+    "audience": "Engineering teams who build internal presentations often",
+    "tone": "direct, confident",
+    "narrative_arc": "problem-solution",
+    "knowledge_base": [
+      "Internal survey: deck edits average 40 minutes of style fixing",
+      "DeckLee schema v1 validator rejects all style payloads"
+    ]
+  },
+  "approval": {
+    "status": "frozen",
+    "approved_at": "2026-06-21T00:00:00.000Z"
+  },
+  "sections": [
+    {
+      "id": "sec-problem",
+      "title": "The Problem",
+      "accepted": true,
+      "beats": [
+        {
+          "id": "beat-drift",
+          "point": "Hand-authored deck markup drifts from the underlying data",
+          "support": "Every theme change forces a manual re-style pass",
+          "slide_hint": "open on the pain, big and bold",
+          "kb_backed": true
+        }
+      ]
+    },
+    {
+      "id": "sec-solution",
+      "title": "The Solution",
+      "accepted": true,
+      "beats": [
+        {
+          "id": "beat-contract",
+          "point": "Author validated JSON and let the renderer own styling",
+          "support": "The schema rejects any style payload, so drift is impossible",
+          "slide_hint": "show the old way next to the new way",
+          "kb_backed": true
+        },
+        {
+          "id": "beat-close",
+          "point": "The best styling is the styling you never write",
+          "support": null,
+          "slide_hint": "memorable closing line",
+          "kb_backed": false
+        }
+      ]
+    }
+  ]
+}

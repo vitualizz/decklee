@@ -1,0 +1,32 @@
+{
+  "schema_version": "1",
+  "kind": "outline",
+  "id": "outline-fixture-valid",
+  "meta": {
+    "title": "Valid Fixture Outline",
+    "audience": "Test readers",
+    "tone": "neutral",
+    "narrative_arc": "thesis-support",
+    "knowledge_base": []
+  },
+  "approval": {
+    "status": "frozen",
+    "approved_at": "2026-06-21T00:00:00.000Z"
+  },
+  "sections": [
+    {
+      "id": "sec-1",
+      "title": "Only Section",
+      "accepted": true,
+      "beats": [
+        {
+          "id": "beat-1",
+          "point": "The single point",
+          "support": null,
+          "slide_hint": "open",
+          "kb_backed": false
+        }
+      ]
+    }
+  ]
+}

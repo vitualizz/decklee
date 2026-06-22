@@ -1,0 +1,7 @@
+# DeckLee
+
+> AI-assistant reference for creating validated presentation decks as JSON.
+
+- AGENTS.md: /AGENTS.md
+- Skill (generic): /skills/generic/AGENTS.md
+- Skill (Claude): /skills/claude/SKILL.md

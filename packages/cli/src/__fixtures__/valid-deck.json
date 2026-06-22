@@ -1,0 +1,29 @@
+{
+  "schema_version": "1",
+  "kind": "deck",
+  "id": "deck-fixture-valid",
+  "meta": {
+    "title": "Valid Fixture Deck",
+    "theme_id": "dev",
+    "source_outline_id": null
+  },
+  "slides": [
+    {
+      "id": "s1",
+      "layout": "hero",
+      "content_props": {
+        "headline": "Hello DeckLee"
+      },
+      "speaker_notes": "Intro slide."
+    },
+    {
+      "id": "s2",
+      "layout": "code",
+      "content_props": {
+        "language": "ts",
+        "code": "const x: number = 1;"
+      },
+      "speaker_notes": null
+    }
+  ]
+}

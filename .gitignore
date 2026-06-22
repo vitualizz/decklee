@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+.turbo/
+*.tsbuildinfo
+
+# Build artifact copied from @decklee/core build output — never hand-authored, never committed.
+packages/cli/templates/decklee-template.html

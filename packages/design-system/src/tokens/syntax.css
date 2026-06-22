@@ -1,0 +1,52 @@
+/**
+ * Syntax tokens — map highlight.js token classes onto design tokens via custom
+ * properties so code coloring follows the active theme. Ships token-agnostic;
+ * carries NO raw colors of its own.
+ *
+ * FR-04 a11y: the highlighted-line marker is a non-color left border so color
+ * is never the sole signal for an emphasized line.
+ */
+.hljs-keyword,
+.hljs-built_in,
+.hljs-type,
+.hljs-literal,
+.hljs-selector-tag,
+.hljs-section,
+.hljs-name {
+  color: var(--dk-color-syntax-keyword);
+}
+
+.hljs-string,
+.hljs-attr,
+.hljs-attribute,
+.hljs-template-tag,
+.hljs-addition,
+.hljs-regexp {
+  color: var(--dk-color-syntax-string);
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-meta,
+.hljs-deletion {
+  color: var(--dk-color-syntax-comment);
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-variable,
+.hljs-title,
+.hljs-params,
+.hljs-tag {
+  color: var(--dk-color-fg-primary);
+}
+
+/* Per-line block emitted by wrapLines(). */
+.dk-code-line {
+  display: block;
+}
+
+/* Non-color emphasis marker for a highlighted line (FR-04). */
+[data-highlighted] {
+  border-left: var(--dk-space-1) solid var(--dk-color-accent-1);
+}

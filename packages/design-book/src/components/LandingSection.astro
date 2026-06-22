@@ -1,0 +1,72 @@
+---
+/**
+ * LandingSection — a top-level section band on the scroll landing page.
+ *
+ * Renders `<section aria-labelledby>` wired to its own h2. The eyebrow numeral
+ * ("01 / Foundations") is a `<span>` ABOVE the h2 — never a heading — so the
+ * document outline stays h1 → h2 → h3 with no skipped levels.
+ *
+ * Heading size is the fluid clamp(28px,4vw,64px) — NOT a literal
+ * --dk-type-scale-* token (those are correct only inside the PrimitiveStage
+ * scale transform). clamp() endpoints are the only literal px here.
+ */
+interface Props {
+  id: string;
+  eyebrow: string;
+  heading: string;
+  subheading?: string;
+}
+
+const { id, eyebrow, heading, subheading } = Astro.props;
+const headingId = `${id}-heading`;
+---
+
+<section id={id} class="dk-section" aria-labelledby={headingId}>
+  <div class="dk-landing__col">
+    <span class="dk-section__eyebrow">{eyebrow}</span>
+    <h2 id={headingId} class="dk-section__heading" tabindex="-1">{heading}</h2>
+    {subheading && <p class="dk-section__sub">{subheading}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .dk-section {
+    /* Section rhythm ≥96px: 72px slide-pad-y + 32px space-8. */
+    padding-block-start: calc(var(--dk-space-slide-pad-y) + var(--dk-space-8));
+  }
+
+  .dk-section__eyebrow {
+    display: block;
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    letter-spacing: var(--dk-type-ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--dk-color-fg-muted);
+    margin-bottom: var(--dk-space-3);
+  }
+
+  .dk-section__heading {
+    margin: 0;
+    font-family: var(--dk-type-family-display);
+    font-weight: var(--dk-type-weight-bold);
+    line-height: var(--dk-type-lh-tight);
+    letter-spacing: var(--dk-type-ls-display);
+    color: var(--dk-color-fg-primary);
+    /* Fluid, NOT --dk-type-scale-* (those are for the scaled canvas only). */
+    font-size: clamp(28px, 4vw, 64px);
+  }
+
+  .dk-section__heading:focus-visible {
+    outline: 2px solid var(--dk-color-accent-1);
+    outline-offset: 2px;
+  }
+
+  .dk-section__sub {
+    margin: var(--dk-space-4) 0 0;
+    max-width: 65ch;
+    font-family: var(--dk-type-family-body);
+    color: var(--dk-color-fg-secondary);
+    line-height: var(--dk-type-lh-relaxed, 1.5);
+  }
+</style>

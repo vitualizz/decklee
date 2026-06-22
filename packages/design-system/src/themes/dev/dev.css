@@ -1,0 +1,36 @@
+/**
+ * Dev theme (FR-02, HC-11) — scoped to [data-theme="dev"].
+ *
+ * Each color token is declared as TWO adjacent full declarations of the same
+ * property: an rgb()/rgba() line first, then an oklch() line. Older engines
+ * keep the sRGB value; capable engines win with oklch through the cascade.
+ * validate-theme.ts enforces this exact form (see validate-theme.test.ts
+ * running against this file as the regression guard).
+ *
+ * Font tokens use family names with web-safe fallbacks only — NO @import,
+ * NO Google Fonts embed, NO @media, NO vw/vh.
+ */
+[data-theme="dev"] {
+  --dk-color-bg-base: rgb(11, 12, 17);
+  --dk-color-bg-base: oklch(7.5% 0.015 265);
+  --dk-color-bg-surface: rgb(20, 22, 30);
+  --dk-color-bg-surface: oklch(11% 0.015 265);
+  --dk-color-fg-primary: rgb(245, 247, 251);
+  --dk-color-fg-primary: oklch(97% 0.006 270);
+  --dk-color-fg-secondary: rgb(223, 228, 236);
+  --dk-color-fg-secondary: oklch(91% 0.008 270);
+  --dk-color-fg-muted: rgb(154, 163, 178);
+  --dk-color-fg-muted: oklch(68% 0.011 265);
+  --dk-color-accent-1: rgb(79, 179, 255);
+  --dk-color-accent-1: oklch(74% 0.145 245);
+  --dk-color-accent-2: rgb(87, 204, 136);
+  --dk-color-accent-2: oklch(76% 0.145 155);
+
+  /* Alpha-only props — no oklch counterpart, exempt from the cascade rule. */
+  --dk-color-border: rgba(255, 255, 255, 0.08);
+  --dk-color-overlay-bg: rgba(11, 12, 17, 0.9);
+
+  --dk-type-family-display: "Space Grotesk", system-ui, sans-serif;
+  --dk-type-family-body: "Instrument Sans", system-ui, sans-serif;
+  --dk-type-family-code: "JetBrains Mono", "Courier New", monospace;
+}

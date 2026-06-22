@@ -1,0 +1,96 @@
+---
+import type { SpacingStep, SpacingPad } from "../scripts/generate-token-data.js";
+
+interface Props {
+  steps: SpacingStep[];
+  padTokens: SpacingPad[];
+}
+
+const { steps, padTokens } = Astro.props;
+const maxPx = Math.max(...steps.map((s) => s.valuePx), 1);
+---
+
+<div class="dk-spacing">
+  <ul class="dk-spacing__list" aria-label="Spacing scale">
+    {steps.map((s) => (
+      <li class="dk-spacing__row">
+        <span class="dk-spacing__label">{s.token}</span>
+        <span
+          class="dk-spacing__bar"
+          style={`width:${Math.round((s.valuePx / maxPx) * 320)}px;`}
+          aria-hidden="true"
+        ></span>
+        <span class="dk-spacing__value">{s.valuePx}px</span>
+      </li>
+    ))}
+  </ul>
+  <figure class="dk-spacing__pads">
+    <figcaption class="dk-spacing__caption">Slide padding</figcaption>
+    <ul class="dk-spacing__list" aria-label="Slide padding tokens">
+      {padTokens.map((p) => (
+        <li class="dk-spacing__row">
+          <span class="dk-spacing__label">{p.token}</span>
+          <span class="dk-spacing__value">{p.valuePx}px ({p.axis})</span>
+        </li>
+      ))}
+    </ul>
+  </figure>
+</div>
+
+<style>
+  /* INSIDE the 1920x1080 canvas — fixed px only, NO vw/vh, NO @media. */
+  .dk-spacing {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 48px;
+    padding: 72px 96px;
+    background-color: var(--dk-color-bg-base);
+    color: var(--dk-color-fg-primary);
+  }
+
+  .dk-spacing__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .dk-spacing__row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .dk-spacing__label,
+  .dk-spacing__value {
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    color: var(--dk-color-fg-muted);
+  }
+
+  .dk-spacing__label {
+    min-width: 220px;
+  }
+
+  .dk-spacing__bar {
+    display: inline-block;
+    height: 16px;
+    background-color: var(--dk-color-accent-1);
+    border-radius: 4px;
+  }
+
+  .dk-spacing__pads {
+    margin: 0;
+  }
+
+  .dk-spacing__caption {
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    letter-spacing: var(--dk-type-ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--dk-color-fg-muted);
+    margin-bottom: 12px;
+  }
+</style>

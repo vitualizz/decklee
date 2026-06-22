@@ -1,0 +1,21 @@
+{
+  "schema_version": "1",
+  "kind": "deck",
+  "id": "deck-fixture-invalid",
+  "meta": {
+    "title": "Invalid Fixture Deck",
+    "theme_id": "dev",
+    "source_outline_id": null
+  },
+  "slides": [
+    {
+      "id": "s1",
+      "layout": "hero",
+      "content_props": {
+        "headline": "Has a banned style key",
+        "style": "color: red"
+      },
+      "speaker_notes": null
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+---
+import BookShell from "../../components/BookShell.astro";
+import PrimitiveStage from "../../components/PrimitiveStage.astro";
+import type { PlayFixture } from "../../data/play.js";
+
+/**
+ * /component/<name> — one fixture's focus/harness page.
+ *
+ * Renders a grid of PrimitiveStage cells, one per variant (ALL variants incl.
+ * stress). Stress cells get a visible marker. Draft fixtures also render the
+ * static promotion checklist (FR-7). getStaticPaths() globs the fixtures at
+ * build time (TR-1/TR-7); the glob lives ONLY here, never in a .ts file.
+ */
+export function getStaticPaths() {
+  const rawFixtures = import.meta.glob("/src/data/fixtures/**/*.demo.ts", {
+    eager: true,
+  }) as Record<string, { default: PlayFixture }>;
+  return Object.values(rawFixtures)
+    .map((m) => m.default)
+    .map((f) => ({ params: { name: f.name }, props: { fixture: f } }));
+}
+
+const { fixture } = Astro.props as { fixture: PlayFixture };
+// obs-2633: Comp assigned in frontmatter; spread as {...v.props as any} below.
+const Comp = fixture.component as any;
+const isDraft = fixture.tier === "draft";
+
+const PROMOTION_CHECKLIST = [
+  "Add the layout literal to packages/schema/src/schemas/deck.schema.ts (z.literal arm) and constants.ts LAYOUT_IDS.",
+  "Add the content_props arm to packages/schema/src/types/content-props.ts.",
+  "Implement packages/design-system/src/primitives/<Name>.astro.",
+  "Implement the viewer twin: packages/viewer/src/render/<name>.ts + a parity fixture in packages/viewer/src/render/parity-fixtures.ts.",
+  "Regenerate AGENTS.md.",
+];
+
+const title = `${fixture.title} — Playground`;
+---
+
+<BookShell title={title} currentHref={`/component/${fixture.name}`}>
+  <div class="dk-landing__col dk-play-focus">
+    <h1 class="dk-play-focus__title">{fixture.title}</h1>
+
+    <div class="dk-play-grid">
+      {fixture.variants.map((v) => (
+        <div
+          class={v.stress ? "dk-play-cell dk-play-stress" : "dk-play-cell"}
+          data-stress={v.stress || undefined}
+        >
+          <div class="dk-play-cell__head">
+            <h3 class="dk-play-cell__name">{v.name}</h3>
+            {v.stress && <span class="dk-play-badge">STRESS</span>}
+          </div>
+          {v.note && <p class="dk-play-cell__note">{v.note}</p>}
+          <PrimitiveStage label={`Live preview: ${fixture.title} — ${v.name}`}>
+            <Comp {...(v.props as any)} />
+          </PrimitiveStage>
+        </div>
+      ))}
+    </div>
+
+    {isDraft && (
+      <section class="dk-play-promotion" aria-labelledby="promotion-heading">
+        <h2 id="promotion-heading">Promotion checklist</h2>
+        <p>Draft primitives are book-local. To publish this primitive, complete:</p>
+        <ol class="dk-play-promotion__list">
+          {PROMOTION_CHECKLIST.map((step) => (
+            <li>{step}</li>
+          ))}
+        </ol>
+      </section>
+    )}
+  </div>
+</BookShell>
+
+<style>
+  .dk-play-focus {
+    padding-block: var(--dk-space-slide-pad-y);
+  }
+
+  .dk-play-focus__title {
+    margin: 0 0 var(--dk-space-8);
+    font-family: var(--dk-type-family-display);
+    font-weight: var(--dk-type-weight-bold);
+    line-height: var(--dk-type-lh-tight);
+    color: var(--dk-color-fg-primary);
+    font-size: clamp(40px, 6vw, 88px);
+  }
+
+  .dk-play-grid {
+    display: grid;
+    gap: var(--dk-space-slide-pad-y);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 1024px) {
+    .dk-play-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .dk-play-cell__head {
+    display: flex;
+    align-items: center;
+    gap: var(--dk-space-4);
+    margin-block-end: var(--dk-space-3);
+  }
+
+  .dk-play-cell__name {
+    margin: 0;
+    font-family: var(--dk-type-family-display);
+    font-weight: var(--dk-type-weight-bold);
+    color: var(--dk-color-fg-primary);
+    font-size: clamp(20px, 2.5vw, 30px);
+  }
+
+  .dk-play-badge {
+    padding: var(--dk-space-1) var(--dk-space-3);
+    border: 1px solid var(--dk-color-accent-2);
+    color: var(--dk-color-accent-2);
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    letter-spacing: var(--dk-type-ls-display);
+  }
+
+  .dk-play-cell__note {
+    margin: 0 0 var(--dk-space-4);
+    color: var(--dk-color-fg-secondary);
+    font-size: var(--dk-type-scale-caption);
+  }
+
+  .dk-play-stress {
+    outline: 1px dashed var(--dk-color-accent-2);
+    outline-offset: var(--dk-space-3);
+  }
+
+  .dk-play-promotion {
+    margin-block-start: var(--dk-space-slide-pad-y);
+    padding-block-start: var(--dk-space-8);
+    border-top: 1px solid var(--dk-color-border);
+  }
+
+  .dk-play-promotion__list {
+    color: var(--dk-color-fg-secondary);
+    line-height: var(--dk-type-lh-relaxed, 1.6);
+  }
+</style>

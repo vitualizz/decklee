@@ -1,0 +1,6 @@
+schema_version: "1"
+detected_at: "2026-06-20T21:05:19Z"
+is_monorepo: { value: "true", source: "manual", confidence: "high" }
+test_runner: { value: "vitest", source: "manual", confidence: "high" }
+naming_style: { value: "kebab-case for files, camelCase for identifiers (Astro/TS convention)", source: "inferred", confidence: "medium" }
+architectural_style: { value: "modular", source: "manual", confidence: "high" }

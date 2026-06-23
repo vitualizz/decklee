@@ -28,6 +28,7 @@ import { getRegisteredThemes } from "@decklee/design-system";
  */
 const THEME_VOICE_MAP: Record<string, string> = {
   dev: "Dark editorial — Space Grotesk / Instrument Sans / JetBrains Mono, oklch accents",
+  aurora: "Dark cosmic — premium, cinematic blue→violet gradient canvas with an electric headline glow",
 };
 
 function renderPropTable(rows: PropRow[]): string {

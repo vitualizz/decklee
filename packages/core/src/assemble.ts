@@ -16,11 +16,15 @@ import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import { NO_JS_MESSAGE } from "@decklee/viewer";
+import { getRegisteredThemes } from "@decklee/design-system";
 
-/** Reserved for future resolveTheme() wiring; v1 always emits the dev theme. */
+/** Theme selection for the assembled template. Defaults to "dev". */
 export type AssembleOpts = {
   theme?: string;
 };
+
+/** The default theme inlined when AssembleOpts.theme is omitted. */
+const DEFAULT_THEME = "dev";
 
 /** The two font CDN hosts the template is permitted to reference. */
 const ALLOWED_FONT_HOSTS = new Set(["fonts.googleapis.com", "fonts.gstatic.com"]);
@@ -30,9 +34,11 @@ const EXTERNAL_URL_RE = /url\(\s*['"]?(?:https?:)?\/\/([^/'")\s]+)/gi;
 
 /**
  * CSS files concatenated, in cascade order, into the inline <style>. reveal's
- * reset+base first, then the design-system tokens, then the dev theme so theme
- * values win. The token files are read individually because tokens/index.css is
- * a pure @import barrel a browser would re-fetch — useless when inlined.
+ * reset+base first, then the design-system tokens, then the chosen theme so
+ * theme values win. The token files are read individually because
+ * tokens/index.css is a pure @import barrel a browser would re-fetch — useless
+ * when inlined. The theme source is appended last by gatherCss(), resolved from
+ * AssembleOpts.theme via the design-system "./themes/*" exports map.
  */
 const CSS_SOURCES: ReadonlyArray<string> = [
   "reveal.js/reset.css",
@@ -41,8 +47,22 @@ const CSS_SOURCES: ReadonlyArray<string> = [
   "@decklee/design-system/tokens/typography",
   "@decklee/design-system/tokens/spacing",
   "@decklee/design-system/tokens/syntax",
-  "@decklee/design-system/themes/dev",
 ];
+
+/**
+ * Resolve a theme_id to its design-system CSS module specifier, validating it
+ * against the registry (the single source of truth). Throws for an unknown
+ * theme, listing the valid ids — mirroring resolveTheme()'s error shape.
+ */
+function themeCssSpecifier(theme: string): string {
+  const registered = getRegisteredThemes();
+  if (!registered.includes(theme)) {
+    throw new Error(
+      `assembleTemplate: unknown theme_id "${theme}". Valid themes: ${registered.join(", ")}.`,
+    );
+  }
+  return `@decklee/design-system/themes/${theme}`;
+}
 
 const GOOGLE_FONTS_HREF =
   "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap";
@@ -71,11 +91,12 @@ function entryPointPath(): string {
  * @throws Error when the viewer dist is missing, esbuild fails, or the inlined
  *   CSS references an external host other than the Google Fonts CDNs.
  */
-export async function assembleTemplate(_opts?: AssembleOpts): Promise<string> {
+export async function assembleTemplate(opts?: AssembleOpts): Promise<string> {
   assertViewerDist();
 
+  const theme = opts?.theme ?? DEFAULT_THEME;
   const iife = await bundleViewer();
-  const css = gatherCss();
+  const css = gatherCss(theme);
   assertCssSelfContained(css);
 
   const coreVersion = readCoreVersion();
@@ -115,8 +136,9 @@ async function bundleViewer(): Promise<string> {
   return result.outputFiles[0].text;
 }
 
-function gatherCss(): string {
-  return CSS_SOURCES.map((spec) =>
+function gatherCss(theme: string): string {
+  const sources = [...CSS_SOURCES, themeCssSpecifier(theme)];
+  return sources.map((spec) =>
     readFileSync(resolvePath(spec), "utf-8"),
   ).join("\n");
 }

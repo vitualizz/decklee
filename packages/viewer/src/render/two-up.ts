@@ -48,11 +48,11 @@ function buildPane(spec: PaneSpec): HTMLElement {
 }
 
 export function renderTwoUp(props: TwoUpProps): HTMLElement {
-  const section = document.createElement("section");
-  section.className = "dk-twoup";
-  section.setAttribute("data-layout", "two-up");
+  const root = document.createElement("div");
+  root.className = "dk-twoup";
+  root.setAttribute("data-layout", "two-up");
 
-  section.appendChild(
+  root.appendChild(
     buildPane({
       side: "left",
       heading: props.left_heading,
@@ -67,10 +67,10 @@ export function renderTwoUp(props: TwoUpProps): HTMLElement {
     const divider = document.createElement("div");
     divider.className = "dk-twoup__divider";
     divider.setAttribute("aria-hidden", "true");
-    section.appendChild(divider);
+    root.appendChild(divider);
   }
 
-  section.appendChild(
+  root.appendChild(
     buildPane({
       side: "right",
       heading: props.right_heading,
@@ -81,5 +81,5 @@ export function renderTwoUp(props: TwoUpProps): HTMLElement {
     }),
   );
 
-  return section;
+  return root;
 }

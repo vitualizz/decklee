@@ -11,15 +11,15 @@ import type { CodeProps } from "@decklee/schema";
 const CAPTION_ID = "dk-code-cap";
 
 export function renderCode(props: CodeProps): HTMLElement {
-  const section = document.createElement("section");
-  section.className = "dk-code";
-  section.setAttribute("data-layout", "code");
+  const root = document.createElement("div");
+  root.className = "dk-code";
+  root.setAttribute("data-layout", "code");
 
   if (props.heading) {
     const heading = document.createElement("h2");
     heading.className = "dk-code__heading";
     heading.textContent = props.heading;
-    section.appendChild(heading);
+    root.appendChild(heading);
   }
 
   const pre = document.createElement("pre");
@@ -36,15 +36,15 @@ export function renderCode(props: CodeProps): HTMLElement {
     props.highlight_lines ?? [],
   );
   pre.appendChild(codeEl);
-  section.appendChild(pre);
+  root.appendChild(pre);
 
   if (props.caption) {
     const caption = document.createElement("p");
     caption.className = "dk-code__caption";
     caption.setAttribute("id", CAPTION_ID);
     caption.textContent = props.caption;
-    section.appendChild(caption);
+    root.appendChild(caption);
   }
 
-  return section;
+  return root;
 }

@@ -1,0 +1,284 @@
+---
+import { DEMO_SLIDES } from "../data/demo-deck.js";
+
+import "reveal.js/reset.css";
+import "reveal.js/reveal.css";
+import "@decklee/design-system/tokens";
+import "@decklee/design-system/themes/dev";
+import "@decklee/design-system/themes/aurora";
+
+interface Props {
+  title: string;
+  theme?: string;
+}
+
+const { title, theme = "dev" } = Astro.props;
+
+const GOOGLE_FONTS_HREF =
+  "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap";
+---
+
+<!DOCTYPE html>
+<html lang="en" data-theme={theme}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={GOOGLE_FONTS_HREF} />
+  </head>
+  <body>
+    <a class="dk-skip-link" href="#dk-demo-stage">Skip to deck</a>
+    <a class="dk-demo-back" href="/">← back</a>
+    <div class="dk-demo-themes" role="group" aria-label="Deck theme">
+      <button type="button" class="dk-demo-theme" data-theme-value="dev">dev</button>
+      <button type="button" class="dk-demo-theme" data-theme-value="aurora">aurora</button>
+    </div>
+    <main id="dk-demo-stage" aria-label={`Lumen pitch deck, ${DEMO_SLIDES.length} slides`}>
+      <div class="reveal" data-theme={theme}>
+        <div class="slides">
+          <slot />
+        </div>
+      </div>
+    </main>
+
+    <script>
+      import { configureReveal } from "@decklee/viewer/reveal-config";
+
+      function bootDeck(): void {
+        const revealEl = document.querySelector<HTMLElement>(".reveal");
+        if (!revealEl) return;
+
+        configureReveal(revealEl);
+
+        const prefersReducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        (window as any).Reveal?.configure?.({
+          transition: prefersReducedMotion ? "none" : "fade",
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if ((e.key === "p" || e.key === "P") && !e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            window.print();
+          }
+        });
+
+        initThemeSwitcher();
+      }
+
+      // Live theme switcher: both theme stylesheets are loaded (each scoped to
+      // its [data-theme]), so swapping the attribute reskins instantly with no
+      // reload. Preference persists in localStorage.
+      function initThemeSwitcher(): void {
+        const KEY = "decklee-demo-theme";
+        const buttons = Array.from(
+          document.querySelectorAll<HTMLButtonElement>(".dk-demo-theme"),
+        );
+        if (buttons.length === 0) return;
+        const html = document.documentElement;
+        const revealEl = document.querySelector<HTMLElement>(".reveal");
+
+        function apply(theme: string): void {
+          html.dataset.theme = theme;
+          revealEl?.setAttribute("data-theme", theme);
+          buttons.forEach((b) =>
+            b.setAttribute(
+              "aria-pressed",
+              String(b.dataset.themeValue === theme),
+            ),
+          );
+          try {
+            localStorage.setItem(KEY, theme);
+          } catch {
+            /* storage unavailable — ignore */
+          }
+        }
+
+        let initial = html.dataset.theme || "aurora";
+        try {
+          const stored = localStorage.getItem(KEY);
+          if (stored) initial = stored;
+        } catch {
+          /* storage unavailable — ignore */
+        }
+        apply(initial);
+
+        buttons.forEach((b) =>
+          b.addEventListener("click", () => {
+            if (b.dataset.themeValue) apply(b.dataset.themeValue);
+          }),
+        );
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", bootDeck, { once: true });
+      } else {
+        bootDeck();
+      }
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  /* ── Color scheme ── */
+  :root {
+    color-scheme: dark;
+  }
+
+  /* ── HTML / body reset ── */
+  html,
+  body {
+    margin: 0;
+    height: 100%;
+    background-color: var(--dk-color-bg-base);
+    color: var(--dk-color-fg-primary);
+    font-family: var(--dk-type-family-body);
+  }
+
+  /* ── Full-page stage ──
+     The deck canvas must own the full viewport height. Without an explicit
+     height here the <main> collapses to content height, reveal measures ~0
+     available space, and floors the slide scale to minScale (0.1) — the deck
+     shrinks to a speck and the screen reads as black. */
+  #dk-demo-stage {
+    height: 100vh;
+  }
+  #dk-demo-stage .reveal {
+    height: 100%;
+  }
+
+  /* ── Screen-reader utility ── */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ── Dark canvas fix ──
+     reveal.css 6.x defaults .reveal-viewport to background:#fff / color:#000.
+     DeckLee ships no reveal theme — design tokens ARE the theme — so we own
+     the canvas background here, or the stage renders as a white void. */
+  .reveal-viewport {
+    background-color: var(--dk-color-bg-base);
+    color: var(--dk-color-fg-primary);
+  }
+  html:not(.print-pdf) .reveal {
+    background: transparent;
+  }
+
+  /* ── Slide fill — the reveal slide owns full height; an inner wrapper
+     centers the primitive ──
+     The primitive is wrapped in a <div class="dk-demo-slide"> (NOT placed as a
+     direct <section> child of the reveal slide). reveal.css matches
+     `.reveal .slides>section>section` with a CHILD combinator and forces
+     display:none/block + position:absolute on it — which would clobber a
+     primitive's own layout display (e.g. TwoUp's grid collapses to a stack).
+     The <div> breaks that child relationship, so reveal leaves the primitive's
+     own <section> alone and its layout renders correctly. */
+  .reveal .slides > section {
+    height: 100%;
+  }
+  .dk-demo-slide {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .dk-demo-slide > [data-layout] {
+    width: 100%;
+  }
+
+  /* ── ← back link ── */
+  .dk-demo-back {
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    color: var(--dk-color-fg-muted);
+    font-size: var(--dk-type-scale-caption);
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    z-index: 100;
+  }
+  .dk-demo-back:focus-visible {
+    outline: 2px solid var(--dk-color-accent-1);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* ── Theme switcher (mirror of ← back, top-right) ── */
+  .dk-demo-themes {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid var(--dk-color-border);
+    border-radius: 999px;
+    background: var(--dk-color-overlay-bg);
+    z-index: 100;
+  }
+  .dk-demo-theme {
+    appearance: none;
+    border: 0;
+    margin: 0;
+    background: transparent;
+    color: var(--dk-color-fg-muted);
+    font-family: var(--dk-type-family-code);
+    font-size: var(--dk-type-scale-caption);
+    line-height: 1;
+    padding: 0.55rem 0.95rem;
+    min-height: 40px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.15s ease, background-color 0.15s ease;
+  }
+  .dk-demo-theme[aria-pressed="true"] {
+    color: var(--dk-color-bg-base);
+    background: var(--dk-color-accent-1);
+  }
+  .dk-demo-theme:focus-visible {
+    outline: 2px solid var(--dk-color-accent-1);
+    outline-offset: 2px;
+  }
+
+  /* ── Skip link (sr-only until focused) ── */
+  .dk-skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    background-color: var(--dk-color-bg-base);
+    color: var(--dk-color-fg-primary);
+    z-index: 200;
+  }
+  .dk-skip-link:focus {
+    top: 0;
+  }
+
+  /* ── Reveal controls / progress token overrides ──
+     reveal.css 6.x controls use currentColor (not SVG path fill).
+     .enabled is the class reveal adds to active directional buttons. */
+  .reveal .controls {
+    color: var(--dk-color-fg-muted);
+  }
+  .reveal .controls .enabled {
+    color: var(--dk-color-accent-1);
+  }
+  .reveal .progress {
+    color: var(--dk-color-accent-1);
+    background: rgba(255, 255, 255, 0.08);
+  }
+</style>

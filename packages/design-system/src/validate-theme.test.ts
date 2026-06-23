@@ -77,6 +77,27 @@ describe("validateTheme() — compliant fixture", () => {
     expect(result.valid).toBe(true);
     expect(result.errors).toHaveLength(0);
   });
+
+  it("self-contained art-direction rules (gradient + glow, no url()) are NOT flagged", () => {
+    const css = `
+[data-theme="test"] {
+  --dk-color-bg-base: rgb(8, 9, 20);
+  --dk-color-bg-base: oklch(8% 0.03 285);
+}
+[data-theme="test"] .dk-hero {
+  background: linear-gradient(160deg, oklch(8% 0.03 285) 0%, oklch(16% 0.08 305) 100%);
+}
+[data-theme="test"] .dk-hero__headline {
+  text-shadow: 0 0 18px oklch(72% 0.17 258 / 0.45);
+}
+    `.trim();
+    const path = writeTempCss(css);
+    const result = validateTheme(path);
+    unlinkSync(path);
+
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -136,6 +157,40 @@ describe("validateTheme() — violations", () => {
     expect(combined).toContain("--dk-color-bg-base");
     expect(combined).toContain("--dk-color-accent-1");
   });
+
+  it("art rule with an external url() → valid:false (self-contained violation)", () => {
+    const css = `
+[data-theme="test"] {
+  --dk-color-bg-base: rgb(8, 9, 20);
+  --dk-color-bg-base: oklch(8% 0.03 285);
+}
+[data-theme="test"] .dk-hero {
+  background: url("https://cdn.example.com/aurora.png");
+}
+    `.trim();
+    const path = writeTempCss(css);
+    const result = validateTheme(path);
+    unlinkSync(path);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.join(" ")).toContain("external url()");
+  });
+
+  it("@import in a theme → valid:false (self-contained violation)", () => {
+    const css = `
+@import "https://fonts.googleapis.com/css2?family=Foo";
+[data-theme="test"] {
+  --dk-color-bg-base: rgb(8, 9, 20);
+  --dk-color-bg-base: oklch(8% 0.03 285);
+}
+    `.trim();
+    const path = writeTempCss(css);
+    const result = validateTheme(path);
+    unlinkSync(path);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.join(" ")).toContain("@import");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -152,6 +207,26 @@ describe("validateTheme() — regression guard on real dev.css", () => {
 
     const result = validateTheme(devCssPath);
 
+    expect(result.errors).toHaveLength(0);
+    expect(result.valid).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Regression guard: real aurora.css must be valid (color contract + art rules)
+// ---------------------------------------------------------------------------
+
+describe("validateTheme() — regression guard on real aurora.css", () => {
+  it("packages/design-system/src/themes/aurora/aurora.css passes validation", () => {
+    const auroraCssPath = new URL(
+      "./themes/aurora/aurora.css",
+      import.meta.url,
+    ).pathname;
+
+    const result = validateTheme(auroraCssPath);
+
+    // Both the rgb-before-oklch color contract AND the art-rule self-contained
+    // assertion (gradient + glow, zero external url()) must pass.
     expect(result.errors).toHaveLength(0);
     expect(result.valid).toBe(true);
   });

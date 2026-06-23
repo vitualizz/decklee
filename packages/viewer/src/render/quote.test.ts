@@ -7,8 +7,9 @@
  * Also tests renderSlide speaker-notes aside (AC-04) via render/index dispatch.
  */
 import { describe, it, expect } from "vitest";
+import type { DeckJson } from "@decklee/schema";
 import { renderQuote } from "./quote.js";
-import { renderSlide } from "./index.js";
+import { renderDeck } from "./index.js";
 
 describe("renderQuote — root element", () => {
   it("returns a <figure> (NOT a section)", () => {
@@ -119,37 +120,49 @@ describe("renderQuote — figcaption (conditional)", () => {
   });
 });
 
-describe("renderSlide — speaker notes aside (AC-04)", () => {
-  it("speaker_notes truthy → aside.notes appended inside slide root", () => {
-    const el = renderSlide({
-      id: "s1",
-      layout: "quote",
-      speaker_notes: "Remember to pause here.",
-      content_props: { quote: "Q" },
-    });
-    const aside = el.querySelector("aside.notes");
+describe("renderDeck — speaker notes aside (AC-04)", () => {
+  // The notes <aside> now lives on the slide <section> wrapper that renderDeck
+  // builds (not on the primitive root). reveal.js's notes plugin reads it there.
+  function oneSlideDeck(slide: unknown): DeckJson {
+    return { slides: [slide] } as unknown as DeckJson;
+  }
+
+  it("speaker_notes truthy → aside.notes inside the slide <section>", () => {
+    const [section] = renderDeck(
+      oneSlideDeck({
+        id: "s1",
+        layout: "quote",
+        speaker_notes: "Remember to pause here.",
+        content_props: { quote: "Q" },
+      }),
+    );
+    const aside = section.querySelector("aside.notes");
     expect(aside).not.toBeNull();
     expect(aside?.textContent).toBe("Remember to pause here.");
   });
 
   it("speaker_notes null → NO aside.notes", () => {
-    const el = renderSlide({
-      id: "s1",
-      layout: "quote",
-      speaker_notes: null,
-      content_props: { quote: "Q" },
-    });
-    expect(el.querySelector("aside.notes")).toBeNull();
+    const [section] = renderDeck(
+      oneSlideDeck({
+        id: "s1",
+        layout: "quote",
+        speaker_notes: null,
+        content_props: { quote: "Q" },
+      }),
+    );
+    expect(section.querySelector("aside.notes")).toBeNull();
   });
 
   it("speaker_notes empty string → NO aside.notes", () => {
-    const el = renderSlide({
-      id: "s1",
-      layout: "hero",
-      speaker_notes: "",
-      content_props: { headline: "H" },
-    });
+    const [section] = renderDeck(
+      oneSlideDeck({
+        id: "s1",
+        layout: "hero",
+        speaker_notes: "",
+        content_props: { headline: "H" },
+      }),
+    );
     // Empty string is falsy — no aside should be rendered
-    expect(el.querySelector("aside.notes")).toBeNull();
+    expect(section.querySelector("aside.notes")).toBeNull();
   });
 });

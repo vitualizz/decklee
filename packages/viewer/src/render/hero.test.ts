@@ -8,9 +8,9 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { renderHero } from "./hero.js";
 
 describe("renderHero — root element", () => {
-  it("returns a <section> element", () => {
+  it("returns a <div> element", () => {
     const el = renderHero({ headline: "Test" });
-    expect(el.tagName.toLowerCase()).toBe("section");
+    expect(el.tagName.toLowerCase()).toBe("div");
   });
 
   it("root has class 'dk-hero'", () => {

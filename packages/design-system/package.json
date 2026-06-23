@@ -17,6 +17,7 @@
     "./tokens/spacing": "./src/tokens/spacing.css",
     "./tokens/syntax": "./src/tokens/syntax.css",
     "./themes/dev": "./src/themes/dev/dev.css",
+    "./themes/aurora": "./src/themes/aurora/aurora.css",
     "./primitives/*": "./src/primitives/*"
   },
   "files": [

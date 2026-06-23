@@ -22,7 +22,7 @@ void theme_id;
 const showBackgroundImage = background_treatment === "image" && Boolean(image_src);
 ---
 
-<section class="dk-hero" data-layout="hero">
+<div class="dk-hero" data-layout="hero">
   {eyebrow && <p class="dk-hero__eyebrow">{eyebrow}</p>}
   <h1 class="dk-hero__headline">{headline}</h1>
   {subheadline && <p class="dk-hero__subheadline">{subheadline}</p>}
@@ -30,18 +30,21 @@ const showBackgroundImage = background_treatment === "image" && Boolean(image_sr
   {showBackgroundImage && (
     <img class="dk-hero__bg" src={image_src} alt={image_alt ?? ""} />
   )}
-</section>
+</div>
 
 <style>
   .dk-hero {
     position: relative;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     gap: var(--dk-space-6);
     padding: var(--dk-space-slide-pad-y) var(--dk-space-slide-pad-x);
     background-color: var(--dk-color-bg-base);
     color: var(--dk-color-fg-primary);
+    text-align: center;
   }
 
   .dk-hero__eyebrow {
@@ -61,6 +64,7 @@ const showBackgroundImage = background_treatment === "image" && Boolean(image_sr
     font-weight: var(--dk-type-weight-bold);
     line-height: var(--dk-type-lh-tight);
     letter-spacing: var(--dk-type-ls-display);
+    text-wrap: balance;
     color: var(--dk-color-fg-primary);
   }
 

@@ -52,15 +52,17 @@ const HAS_VIEWER_DIST = viewerDistExists();
 // We write a tiny .mjs script to a temp file and run it with node.
 // ---------------------------------------------------------------------------
 
-async function runAssembleInSubprocess(): Promise<string> {
+async function runAssembleInSubprocess(theme?: string): Promise<string> {
   const thisDir = fileURLToPath(new URL(".", import.meta.url));
-  const scriptPath = join(tmpdir(), `assemble-runner-${Date.now()}.mjs`);
+  const scriptPath = join(tmpdir(), `assemble-runner-${Date.now()}-${Math.random().toString(36).slice(2)}.mjs`);
 
   // The runner imports assemble.ts directly via --experimental-strip-types.
-  // assemble.ts lives next to this test file in src/.
+  // assemble.ts lives next to this test file in src/. The theme arg (if any)
+  // is passed through to exercise AssembleOpts.theme resolution.
+  const optsLiteral = theme === undefined ? "" : JSON.stringify({ theme });
   const scriptContent = `
 import { assembleTemplate } from ${JSON.stringify(join(thisDir, "assemble.ts"))};
-const html = await assembleTemplate();
+const html = await assembleTemplate(${optsLiteral});
 process.stdout.write(html);
 `;
 
@@ -274,4 +276,47 @@ describe.skipIf(!HAS_VIEWER_DIST)("assembleTemplate() integration", () => {
     expect(typeof html).toBe("string");
     expect(html.length).toBeGreaterThan(1000);
   });
+});
+
+// ---------------------------------------------------------------------------
+// Theme resolution suite -- AssembleOpts.theme wiring (default dev + aurora)
+// ---------------------------------------------------------------------------
+
+describe.skipIf(!HAS_VIEWER_DIST)("assembleTemplate() theme resolution", () => {
+  function styleBlock(html: string): string {
+    const m = html.match(/<style>([\s\S]*?)<\/style>/);
+    expect(m).not.toBeNull();
+    return m![1];
+  }
+
+  it("defaults to the dev theme when no theme is provided", async () => {
+    const html = await runAssembleInSubprocess();
+    const css = styleBlock(html);
+    expect(css).toContain('[data-theme="dev"]');
+    expect(css).not.toContain('[data-theme="aurora"]');
+  });
+
+  it("inlines the aurora theme CSS when theme: 'aurora' is provided", async () => {
+    const html = await runAssembleInSubprocess("aurora");
+    const css = styleBlock(html);
+    expect(css).toContain('[data-theme="aurora"]');
+    // Aurora's art-direction gradient lands in the inlined CSS (standalone HTML).
+    expect(css).toContain("linear-gradient");
+  }, 90_000);
+
+  it("aurora CSS stays self-contained (no external url() in the <style>)", async () => {
+    const html = await runAssembleInSubprocess("aurora");
+    const css = styleBlock(html);
+    const externalUrls = [
+      ...css.matchAll(/url\(\s*['"]?(?:https?:)?\/\/([^/'")\s]+)/gi),
+    ].filter((m) => {
+      const host = m[1];
+      return host !== "fonts.googleapis.com" && host !== "fonts.gstatic.com";
+    });
+    expect(externalUrls).toHaveLength(0);
+  }, 90_000);
+
+  it("throws (subprocess exit != 0) for an unknown theme_id", async () => {
+    await expect(runAssembleInSubprocess("does-not-exist")).rejects.toThrow();
+  }, 90_000);
 });

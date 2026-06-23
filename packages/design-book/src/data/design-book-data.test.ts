@@ -455,7 +455,7 @@ describe("Build smoke — dist/rule/index.html", () => {
 
 // ── 4. Build smoke gate — dist/demo/index.html (DECK, reveal) ────────────────
 //
-// The `/demo` route is the full reveal.js presentation deck (all 26 STORIES).
+// The `/demo` route is the Lumen sales deck (17 slides).
 // It MUST have the reveal root, the slides container, deck sections, and the
 // keyboard-reachable back-link to "/" that lets users return to the landing.
 
@@ -483,13 +483,12 @@ describe("Build smoke — dist/demo/index.html (deck, WITH reveal)", () => {
     expect(html).toContain('class="slides"');
   });
 
-  it("contains ~26 <section data-id> deck slides (within ±2 tolerance)", () => {
+  it("contains 17 <section data-id> deck slides", () => {
     const matches = html.match(/<section data-id="/g) ?? [];
     expect(
       matches.length,
-      `Expected ~26 <section data-id> elements in demo, got ${matches.length}`
-    ).toBeGreaterThanOrEqual(24);
-    expect(matches.length).toBeLessThanOrEqual(28);
+      `Expected 17 <section data-id> elements in demo, got ${matches.length}`
+    ).toBe(17);
   });
 
   it("contains the back-link href=\"/\" (← Back to the book)", () => {

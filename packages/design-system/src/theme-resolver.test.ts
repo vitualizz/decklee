@@ -23,6 +23,11 @@ describe("resolveTheme()", () => {
     expect(result).toContain("dev.css");
   });
 
+  it("resolves 'aurora' to a path containing 'aurora.css'", () => {
+    const result = resolveTheme("aurora");
+    expect(result).toContain("aurora.css");
+  });
+
   it("throws for an unknown theme_id", () => {
     expect(() => resolveTheme("nope")).toThrow();
   });
@@ -60,8 +65,8 @@ describe("getRegisteredThemes()", () => {
     expect(Array.isArray(result)).toBe(true);
   });
 
-  it("returns exactly ['dev']", () => {
-    expect(getRegisteredThemes()).toEqual(["dev"]);
+  it("returns exactly ['dev', 'aurora']", () => {
+    expect(getRegisteredThemes()).toEqual(["dev", "aurora"]);
   });
 
   it("each entry from getRegisteredThemes() resolves without throwing", () => {

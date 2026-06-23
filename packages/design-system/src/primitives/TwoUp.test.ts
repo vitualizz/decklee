@@ -27,10 +27,10 @@ const BASE_PROPS = {
 // ---------------------------------------------------------------------------
 
 describe("TwoUp — structure", () => {
-  it("renders a <section> with data-layout='two-up'", async () => {
+  it("renders a <div> with data-layout='two-up'", async () => {
     const html = await renderTwoUp(BASE_PROPS);
     expect(html).toContain('data-layout="two-up"');
-    expect(html).toContain("<section");
+    expect(html).toContain("<div");
   });
 
   it("renders two pane divs", async () => {

@@ -1,0 +1,85 @@
+/**
+ * Aurora theme (aurora-theme change) — scoped to [data-theme="aurora"].
+ *
+ * Dark, cosmic, cinematic: a deep blue→violet gradient canvas with an electric
+ * headline glow. SCALAR identity (color) is expressed via the --dk-color-*
+ * token contract; NON-SCALAR art (gradient bg, glow) lives in the clearly
+ * delimited ART DIRECTION block below (Option C Hybrid, see ADR aurora-theme).
+ *
+ * Each color token is declared as TWO adjacent full declarations of the same
+ * property: an rgb()/rgba() line first, then an oklch() line. Older engines
+ * keep the sRGB value; capable engines win with oklch through the cascade.
+ * validate-theme.ts enforces this exact form.
+ *
+ * Font tokens REUSE dev's three families (v1, see ADR §7) — identical values.
+ * No @import, NO Google Fonts embed, NO @media, NO vw/vh, NO external url().
+ */
+[data-theme="aurora"] {
+  /* --- canvas --- */
+  --dk-color-bg-base: rgb(8, 9, 20);
+  --dk-color-bg-base: oklch(8% 0.03 285);
+  --dk-color-bg-surface: rgb(20, 20, 40);
+  --dk-color-bg-surface: oklch(15% 0.045 285);
+
+  /* --- text (AA-checked on bg-base) --- */
+  --dk-color-fg-primary: rgb(244, 246, 255);
+  --dk-color-fg-primary: oklch(97% 0.012 280);
+  --dk-color-fg-secondary: rgb(199, 205, 235);
+  --dk-color-fg-secondary: oklch(84% 0.03 280);
+  --dk-color-fg-muted: rgb(150, 158, 196);
+  --dk-color-fg-muted: oklch(68% 0.05 280);
+
+  /* --- accents: electric blue + violet/magenta --- */
+  --dk-color-accent-1: rgb(94, 158, 255);
+  --dk-color-accent-1: oklch(72% 0.17 258);
+  --dk-color-accent-2: rgb(196, 122, 255);
+  --dk-color-accent-2: oklch(70% 0.20 305);
+
+  /* Alpha-only props — no oklch counterpart, exempt from the cascade rule. */
+  --dk-color-border: rgba(160, 150, 255, 0.14);
+  --dk-color-overlay-bg: rgba(8, 9, 20, 0.92);
+
+  --dk-type-family-display: "Space Grotesk", system-ui, sans-serif;
+  --dk-type-family-body: "Instrument Sans", system-ui, sans-serif;
+  --dk-type-family-code: "JetBrains Mono", "Courier New", monospace;
+}
+
+/* === ART DIRECTION (non-scalar; see ADR aurora-theme) ======================
+ * Effects that cannot be a single scalar color token. Pure CSS only — zero
+ * url(), no @import. The gradient is declared at BOTH canvas levels so it is
+ * full-bleed in both surfaces: .reveal-viewport paints the design-book shell
+ * canvas; the primitive roots paint the slide content (the ONLY level present
+ * in the standalone assembled HTML deck). The two gradient values are kept in
+ * sync by hand (intrinsic to Option C). Gradient max lightness is capped at
+ * 16% L so fg-muted body text stays >= AA 4.5:1 over the bulk of the canvas.
+ * ========================================================================= */
+
+/* shell canvas (design-book) */
+[data-theme="aurora"] .reveal-viewport {
+  background: linear-gradient(
+    160deg,
+    oklch(8% 0.03 285) 0%,
+    oklch(13% 0.06 280) 55%,
+    oklch(16% 0.08 305) 100%
+  );
+}
+
+/* slide content (also the ONLY level present in the standalone HTML deck) */
+[data-theme="aurora"] .dk-hero,
+[data-theme="aurora"] .dk-quote,
+[data-theme="aurora"] .dk-twoup,
+[data-theme="aurora"] .dk-code {
+  background: linear-gradient(
+    160deg,
+    oklch(8% 0.03 285) 0%,
+    oklch(13% 0.06 280) 55%,
+    oklch(16% 0.08 305) 100%
+  );
+}
+
+/* headline glow — soft electric halo, layered for depth */
+[data-theme="aurora"] .dk-hero__headline {
+  text-shadow:
+    0 0 18px oklch(72% 0.17 258 / 0.45),
+    0 0 44px oklch(70% 0.20 305 / 0.30);
+}

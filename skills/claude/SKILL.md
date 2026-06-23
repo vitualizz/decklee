@@ -104,6 +104,7 @@ or `content_props`.
 | theme_id | Voice |
 | --- | --- |
 | `dev` | Dark editorial — Space Grotesk / Instrument Sans / JetBrains Mono, oklch accents |
+| `aurora` | Dark cosmic — premium, cinematic blue→violet gradient canvas with an electric headline glow |
 
 ## CONTENT CONSTRAINTS
 

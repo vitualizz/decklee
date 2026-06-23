@@ -11,9 +11,9 @@ import { renderCode } from "./code.js";
 const MINIMAL = { code: "const x = 1;", language: "typescript" };
 
 describe("renderCode — root element", () => {
-  it("returns a <section> element", () => {
+  it("returns a <div> element", () => {
     const el = renderCode(MINIMAL);
-    expect(el.tagName.toLowerCase()).toBe("section");
+    expect(el.tagName.toLowerCase()).toBe("div");
   });
 
   it("root has class 'dk-code'", () => {

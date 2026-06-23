@@ -15,22 +15,26 @@ const wrapped = wrapLines(tokenized, highlight_lines ?? []);
 const CAPTION_ID = "dk-code-cap";
 ---
 
-<section class="dk-code" data-layout="code">
+<div class="dk-code" data-layout="code">
   {heading && <h2 class="dk-code__heading">{heading}</h2>}
   <pre class="dk-code__pre" aria-describedby={caption ? CAPTION_ID : undefined}>
     <code class="hljs dk-code__code" data-lang={language} set:html={wrapped} />
   </pre>
   {caption && <p class="dk-code__caption" id={CAPTION_ID}>{caption}</p>}
-</section>
+</div>
 
 <style>
   .dk-code {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: var(--dk-space-5);
     padding: var(--dk-space-slide-pad-y) var(--dk-space-slide-pad-x);
     background-color: var(--dk-color-bg-base);
     color: var(--dk-color-fg-primary);
+    /* Own the alignment — do NOT inherit reveal.js's text-align:center.
+       Heading + caption align left, coherent with the left-aligned code. */
+    text-align: left;
   }
 
   .dk-code__heading {

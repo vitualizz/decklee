@@ -22,10 +22,10 @@ async function renderHero(props: Record<string, unknown>): Promise<string> {
 // ---------------------------------------------------------------------------
 
 describe("Hero — structure", () => {
-  it("renders a <section> with data-layout='hero'", async () => {
+  it("renders a <div> with data-layout='hero'", async () => {
     const html = await renderHero({ headline: "Test Headline", theme_id: "dev" });
     expect(html).toContain('data-layout="hero"');
-    expect(html).toContain("<section");
+    expect(html).toContain("<div");
   });
 
   it("renders an <h1> containing the headline text", async () => {

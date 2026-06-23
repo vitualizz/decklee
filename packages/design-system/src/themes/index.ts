@@ -4,4 +4,5 @@
  */
 export const THEME_REGISTRY: Record<string, string> = {
   dev: new URL("./dev/dev.css", import.meta.url).href,
+  aurora: new URL("./aurora/aurora.css", import.meta.url).href,
 };

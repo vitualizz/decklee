@@ -13,9 +13,9 @@ const BASE_PROPS = {
 };
 
 describe("renderTwoUp — root element", () => {
-  it("returns a <section> element", () => {
+  it("returns a <div> element", () => {
     const el = renderTwoUp(BASE_PROPS);
-    expect(el.tagName.toLowerCase()).toBe("section");
+    expect(el.tagName.toLowerCase()).toBe("div");
   });
 
   it("root has class 'dk-twoup'", () => {

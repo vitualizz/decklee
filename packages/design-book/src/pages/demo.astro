@@ -1,202 +1,33 @@
 ---
+import DemoShell from "../components/DemoShell.astro";
 import Hero from "@decklee/design-system/primitives/Hero.astro";
 import TwoUp from "@decklee/design-system/primitives/TwoUp.astro";
 import Code from "@decklee/design-system/primitives/Code.astro";
 import Quote from "@decklee/design-system/primitives/Quote.astro";
+import { DEMO_SLIDES } from "../data/demo-deck.js";
+import type { DemoSlide } from "../data/demo-deck.js";
 
-import BookLayout from "../components/BookLayout.astro";
-import StaticStackedFallback from "../components/StaticStackedFallback.astro";
-import PropApiTable from "../components/PropApiTable.astro";
-import TokenReferenceTable from "../components/TokenReferenceTable.astro";
-import ColorSwatchGrid from "../components/ColorSwatchGrid.astro";
-import TypeSpecimen from "../components/TypeSpecimen.astro";
-import SpacingScaleViz from "../components/SpacingScaleViz.astro";
-import ThemeContributorBlock from "../components/ThemeContributorBlock.astro";
-
-import { STORIES, SECTIONS } from "../data/design-book.js";
-import type { PlayFixture } from "../data/play.js";
-import { PROP_TABLES } from "../data/prop-table-data.js";
-import {
-  COLOR_SWATCHES,
-  TOKEN_ROWS,
-  TYPE_SCALE,
-  TYPE_FAMILIES,
-  SPACING_STEPS,
-  SPACING_PADS,
-} from "../data/token-data.js";
-
-const PRIMITIVES = { hero: Hero, "two-up": TwoUp, code: Code, quote: Quote } as const;
-
-const propRowsFor = (primitive: string) =>
-  PROP_TABLES.find((t) => t.primitive === primitive)?.rows ?? [];
-
-const titleCase = (name: string) =>
-  name === "two-up" ? "Two-Up" : name.charAt(0).toUpperCase() + name.slice(1);
-
-// ── Playground fixtures: the glob lives ONLY in .astro frontmatter (TR-1).
-const rawFixtures = import.meta.glob("/src/data/fixtures/**/*.demo.ts", {
-  eager: true,
-}) as Record<string, { default: PlayFixture }>;
-
-// Canonical primitive order — overrides the alphabetical glob-key sort.
-const FIXTURE_ORDER = ["hero", "two-up", "code", "quote"];
-const orderIndex = (name: string) => {
-  const i = FIXTURE_ORDER.indexOf(name);
-  return i === -1 ? FIXTURE_ORDER.length : i;
+// Astro template parser mis-reads generics in {} expressions (obs-2633).
+// All typed logic stays in frontmatter; template uses `as any`.
+const PRIMITIVE_MAP: Record<DemoSlide["layout"], unknown> = {
+  "hero": Hero,
+  "two-up": TwoUp,
+  "code": Code,
+  "quote": Quote,
 };
 
-const LOCKED_FIXTURES = Object.values(rawFixtures)
-  .map((m) => m.default)
-  .filter((f) => f.tier === "locked")
-  .sort((a, b) => orderIndex(a.name) - orderIndex(b.name));
-
-// A single deck slide — editorial (from STORIES) or fixture-derived.
-type DeckSlide = {
-  id: string;
-  sectionId: string;
-  label: string;
-  headingId: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Component: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  props: any;
-  highlightedProps: string[];
-  bookChrome: { prop_table?: string; visual?: string; token_table?: string; annotation?: string };
-};
-
-// Editorial slides — Astro's template parser mis-reads generics in `{...}`
-// expressions, so all typed destructuring + casts stay in frontmatter (obs-2633).
-const editorialSlides: DeckSlide[] = STORIES.map((story) => {
-  const Component = story.primitive ? PRIMITIVES[story.primitive] : Hero;
-  const props = story.props as Record<string, unknown>;
-  const { theme_id, ...contentProps } = props;
-  void theme_id;
-  return {
-    id: story.id,
-    sectionId: story.sectionId,
-    label: story.primitive
-      ? `${story.section} — ${story.variant_label}`
-      : story.section,
-    headingId: story.id + "-heading",
-    Component,
-    props: props as any,
-    highlightedProps: Object.keys(contentProps),
-    bookChrome: story.book_chrome,
-  };
-});
-
-// Fixture-derived slides — NON-stress variants only (R1: keeps the public deck
-// curated and the slide count in AC-3 range). 4 fixtures × 3 = 12 slides.
-const derivedSlides: DeckSlide[] = LOCKED_FIXTURES.flatMap((fixture) =>
-  fixture.variants
-    .filter((v) => !v.stress)
-    .map((variant) => {
-      const props = variant.props as Record<string, unknown>;
-      const { theme_id, ...contentProps } = props;
-      void theme_id;
-      const id = `${fixture.name}-${variant.name}`;
-      return {
-        id,
-        sectionId: "primitives",
-        label: `${titleCase(fixture.name)} — ${variant.name}`,
-        headingId: id + "-heading",
-        Component: fixture.component as any,
-        props: props as any,
-        highlightedProps: Object.keys(contentProps),
-        bookChrome: { prop_table: fixture.name },
-      };
-    }),
-);
-
-// Merge: walk editorial slides in order; splice the derived slides in right
-// AFTER the primitives-opener so the rail's "primitives" entry stays anchored.
-const merged: DeckSlide[] = [];
-for (const slide of editorialSlides) {
-  merged.push(slide);
-  if (slide.id === "primitives-opener") {
-    merged.push(...derivedSlides);
-  }
-}
-
-// Live-region map per slide index, matching the merged order.
-const storyMap = merged.map((slide, index) => ({
-  index,
-  id: slide.id,
-  label: slide.label,
-  primitive: null,
-}));
-
-// Theme contract checklist + contributor steps (book-chrome panels for §3).
-const THEME_CHECKLIST = [
-  { label: "Override every --dk-color-* role", detail: "bg, fg, accents, border, overlay" },
-  { label: "Override the three type families", detail: "--dk-type-family-*" },
-  { label: "Ship the rgb()-before-oklch() cascade", detail: "rgb() line, then oklch()" },
-  { label: "Register a theme_id", detail: "THEME_REGISTRY" },
-];
-const THEME_STEPS = [
-  { label: "Create the theme file", detail: "src/themes/{id}/{id}.css" },
-  { label: "Register it", detail: "src/themes/index.ts → THEME_REGISTRY" },
-  { label: "Verify against this book", detail: "meta.theme_id = {id}; astro build" },
-];
-
-const title = "DeckLee Design Book — Deck";
+const slides: DemoSlide[] = DEMO_SLIDES;
 ---
 
-<BookLayout title={title} slideCount={merged.length} sections={SECTIONS} storyMap={storyMap}>
-  <a slot="sidebar" href="/">← Back to the book</a>
-
-  <StaticStackedFallback>
-    {merged.map(({ id, sectionId, label, Component, headingId, props, highlightedProps, bookChrome }) => (
-      <section
-        data-id={id}
-        data-section-id={sectionId}
-        class="dk-stack-section"
-        aria-labelledby={headingId}
-      >
-        <Component {...props} />
-
-        <h2 id={headingId} class="dk-stack-section__heading">
-          {label}
-        </h2>
-
-        {bookChrome.visual === "color-swatches" && (
-          <ColorSwatchGrid swatches={COLOR_SWATCHES} />
-        )}
-        {bookChrome.visual === "type-specimen" && (
-          <TypeSpecimen families={TYPE_FAMILIES} scale={TYPE_SCALE} />
-        )}
-        {bookChrome.visual === "spacing-viz" && (
-          <SpacingScaleViz steps={SPACING_STEPS} padTokens={SPACING_PADS} />
-        )}
-        {bookChrome.visual === "theme-checklist" && (
-          <ThemeContributorBlock variant="checklist" items={THEME_CHECKLIST} />
-        )}
-        {bookChrome.visual === "theme-steps" && (
-          <ThemeContributorBlock variant="steps" items={THEME_STEPS} />
-        )}
-
-        {(bookChrome.prop_table || bookChrome.token_table || bookChrome.annotation) && (
-          <div class="dk-stack-section__disclosure">
-            {bookChrome.annotation && <p>{bookChrome.annotation}</p>}
-            {bookChrome.prop_table && (
-              <details>
-                <summary>Show component props</summary>
-                <PropApiTable
-                  primitive={bookChrome.prop_table}
-                  rows={propRowsFor(bookChrome.prop_table)}
-                  highlightedProps={highlightedProps}
-                />
-              </details>
-            )}
-            {bookChrome.token_table === "color" && (
-              <details>
-                <summary>Show token reference</summary>
-                <TokenReferenceTable category="color" rows={TOKEN_ROWS} />
-              </details>
-            )}
-          </div>
-        )}
+<DemoShell title="Lumen — Observability that explains itself" theme="aurora">
+  {slides.map((slide) => {
+    const Comp = PRIMITIVE_MAP[slide.layout] as any;
+    return (
+      <section data-id={slide.id} aria-label={slide.label}>
+        <div class="dk-demo-slide">
+          <Comp {...slide.props as any} />
+        </div>
       </section>
-    ))}
-  </StaticStackedFallback>
-</BookLayout>
+    );
+  })}
+</DemoShell>

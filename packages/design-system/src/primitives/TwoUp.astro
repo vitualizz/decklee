@@ -24,7 +24,7 @@ const showLeftImage = left_type === "image" && Boolean(left_image_src);
 const showRightImage = right_type === "image" && Boolean(right_image_src);
 ---
 
-<section class="dk-twoup" data-layout="two-up">
+<div class="dk-twoup" data-layout="two-up">
   <div
     class="dk-twoup__pane dk-twoup__pane--left"
     aria-label={left_heading ? undefined : "left panel"}
@@ -48,10 +48,11 @@ const showRightImage = right_type === "image" && Boolean(right_image_src);
       <p class="dk-twoup__body">{right_body}</p>
     )}
   </div>
-</section>
+</div>
 
 <style>
   .dk-twoup {
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
@@ -59,6 +60,9 @@ const showRightImage = right_type === "image" && Boolean(right_image_src);
     padding: var(--dk-space-slide-pad-y) var(--dk-space-slide-pad-x);
     background-color: var(--dk-color-bg-base);
     color: var(--dk-color-fg-primary);
+    /* Own the alignment — do NOT inherit reveal.js's text-align:center.
+       Left-aligned body copy reads better in two columns. */
+    text-align: left;
   }
 
   .dk-twoup__pane {

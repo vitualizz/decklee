@@ -5,11 +5,24 @@
  * safeValidateDeck runs BEFORE emitDeck so a bad deck yields friendly
  * FieldError[] instead of injectDeck's throwing validateDeck (R3).
  */
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { emitDeck } from "@decklee/core";
 import { safeValidateDeck, type FieldError } from "@decklee/schema";
 import { resolveBundledTemplate } from "../paths.js";
+import {
+  inlineImages,
+  InlinerError,
+  TOTAL_HTML_ADVISORY_BYTES,
+  TOTAL_HTML_ESCALATED_BYTES,
+} from "../inline-images.js";
+
+/** Human-readable byte size for advisory output, e.g. "16.2 MB". */
+function humanBytes(bytes: number): string {
+  if (bytes >= 1_048_576) return `${(bytes / 1_048_576).toFixed(1)} MB`;
+  if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${bytes} B`;
+}
 
 const EXIT_OK = 0;
 const EXIT_USER = 1;
@@ -45,7 +58,24 @@ export async function runBuild(
     return EXIT_USER;
   }
 
-  const validated = safeValidateDeck(parsed);
+  // --- IMAGE INLINER (NEW) — inline → validate → emit invariant (ADR D1) ---
+  let inlined: unknown;
+  try {
+    const result = inlineImages(parsed, file);
+    inlined = result.data;
+    for (const w of result.warnings) {
+      process.stderr.write(`warning: ${w.message}\n`); // plain text, NOT JSON envelope (D3)
+    }
+  } catch (caught) {
+    if (caught instanceof InlinerError) {
+      printErrorEnvelope(caught.code, caught.message);
+      return caught.code === "IO_ERROR" ? EXIT_IO : EXIT_USER;
+    }
+    printErrorEnvelope("IO_ERROR", `Image inlining failed: ${(caught as Error).message}`);
+    return EXIT_IO;
+  }
+
+  const validated = safeValidateDeck(inlined);
   if (!validated.ok) {
     printErrorEnvelope("VALIDATION_ERROR", `${file} failed schema validation.`, validated.errors);
     return EXIT_USER;
@@ -72,6 +102,24 @@ export async function runBuild(
   } catch (caught) {
     printErrorEnvelope("IO_ERROR", `Could not write ${outPath}: ${(caught as Error).message}`);
     return EXIT_IO;
+  }
+
+  // --- POST-BUILD TOTAL-HTML SIZE ADVISORY (NFR-2) — never blocks a build ---
+  try {
+    const htmlBytes = statSync(outPath).size;
+    if (htmlBytes >= TOTAL_HTML_ESCALATED_BYTES) {
+      process.stderr.write(
+        `warning: output ${outPath} is ${humanBytes(htmlBytes)} (> 20MB) — ` +
+          `this HTML may be slow to open/share; resize large images.\n`,
+      );
+    } else if (htmlBytes >= TOTAL_HTML_ADVISORY_BYTES) {
+      process.stderr.write(
+        `warning: output ${outPath} is ${humanBytes(htmlBytes)} (> 15MB) — ` +
+          `consider resizing large images.\n`,
+      );
+    }
+  } catch {
+    /* stat failure is non-fatal; never blocks a successful build */
   }
 
   process.stdout.write(`Built: ${outPath}\n`);

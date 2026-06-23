@@ -22,14 +22,14 @@ async function renderCode(props: Record<string, unknown>): Promise<string> {
 // ---------------------------------------------------------------------------
 
 describe("Code — structure", () => {
-  it("renders a <section> with data-layout='code'", async () => {
+  it("renders a <div> with data-layout='code'", async () => {
     const html = await renderCode({
       code: "const x = 1;",
       language: "typescript",
       theme_id: "dev",
     });
     expect(html).toContain('data-layout="code"');
-    expect(html).toContain("<section");
+    expect(html).toContain("<div");
   });
 
   it("renders a <pre> containing a <code> element", async () => {

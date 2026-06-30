@@ -38,8 +38,15 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Builds decklee AND its internal @decklee/* deps (build inputs, not published).
-      - run: pnpm -F decklee... build
+      # The CLI bundles a prebuilt, self-contained template produced by core's
+      # separate build-template step. That file is gitignored, so CI must
+      # regenerate it. Order matters:
+      #   1. build core + its deps (schema, design-system, viewer) via tsc
+      #   2. produce decklee-template.html (build-template)
+      #   3. bundle the CLI (copy-template + esbuild) — template now exists
+      - run: pnpm -F "@decklee/core..." build
+      - run: pnpm -F @decklee/core build-template
+      - run: pnpm -F decklee build
 
       - run: pnpm -F decklee publish --provenance --no-git-checks --access public
         env:

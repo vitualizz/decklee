@@ -5,7 +5,7 @@
  */
 import { readFileSync } from "node:fs";
 
-import { assembleTemplate, type AssembleOpts } from "./assemble.js";
+import type { AssembleOpts } from "./assemble.js";
 import { injectDeck } from "./inject.js";
 
 export type EmitOpts = AssembleOpts & {
@@ -26,6 +26,7 @@ export async function emitDeck(deck: unknown, opts?: EmitOpts): Promise<string> 
   } else if (opts?.templatePath != null) {
     html = readFileSync(opts.templatePath, "utf-8");
   } else {
+    const { assembleTemplate } = await import("./assemble.js");
     html = await assembleTemplate(opts);
   }
   return injectDeck(html, deck);

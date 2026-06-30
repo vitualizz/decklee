@@ -4,6 +4,7 @@
   "description": "Canonical Outline + Deck data model and HC-03 validators for DeckLee.",
   "license": "MIT",
   "type": "module",
+  "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

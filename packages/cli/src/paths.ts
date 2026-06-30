@@ -25,6 +25,16 @@ export function resolveBundledTemplate(): string {
 }
 
 /**
+ * Absolute path to the static `init-scaffold/` snapshot shipped beside the
+ * compiled CLI. Mirrors {@link resolveBundledTemplate}: the bundled output
+ * collapses to dist/ root (esbuild --splitting), so `../templates` resolves to
+ * the package's templates/ dir regardless of which chunk this function lands in.
+ */
+export function resolveInitScaffold(): string {
+  return fileURLToPath(new URL("../templates/init-scaffold", import.meta.url));
+}
+
+/**
  * Repo root resolved from a script under packages/cli/scripts/ at RUNTIME via
  * `node --experimental-strip-types` (the script runs from its source location,
  * NOT from dist/). packages/cli/scripts/ → up 3 levels → repo root.

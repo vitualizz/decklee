@@ -1,7 +1,6 @@
 /**
  * Public API barrel for @decklee/core — the maintainer-time deck assembler.
  */
-export { assembleTemplate } from "./assemble.js";
 export type { AssembleOpts } from "./assemble.js";
 export { injectDeck, safeJsonForHtml } from "./inject.js";
 export { emitDeck } from "./emit.js";

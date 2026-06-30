@@ -1,11 +1,12 @@
 /**
  * generate-contract.ts — writes the committed AI-assistant contract files to
  * the repo root and refreshes the init-scaffold skill snapshot. Runs via
- * `node --experimental-strip-types scripts/generate-contract.ts`.
+ * `tsx scripts/generate-contract.ts`.
  *
- * It imports the generators from the COMPILED dist/ (the `build` script runs
- * before `generate:agents-md`), so this script never depends on TS-resolving
- * the .ts sources directly.
+ * It imports the generators straight from the .ts sources (resolving the
+ * NodeNext `.js` specifiers back to `.ts` via tsx), so it has NO dependency on
+ * a prior tsc dist emit (the CLI now bundles via esbuild, which emits no
+ * per-module dist).
  *
  * The drift-check test re-runs the same generators in-proc and diffs against
  * the files this script writes — so these files MUST be committed (R7).
@@ -13,8 +14,8 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { generateAgentsMd } from "../dist/generator/agents-md.js";
-import { generateSkillWrappers } from "../dist/generator/skill-wrappers.js";
+import { generateAgentsMd } from "../src/generator/agents-md.ts";
+import { generateSkillWrappers } from "../src/generator/skill-wrappers.ts";
 
 // packages/cli/scripts/ → up 3 → repo root.
 const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));

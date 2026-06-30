@@ -25,7 +25,7 @@ importers:
         version: 3.2.6(@types/debug@4.1.13)(@types/node@20.19.43)(jsdom@25.0.1)(tsx@4.22.4)(yaml@2.9.0)
 
   packages/cli:
-    dependencies:
+    devDependencies:
       '@decklee/core':
         specifier: workspace:*
         version: link:../core
@@ -35,10 +35,15 @@ importers:
       '@decklee/schema':
         specifier: workspace:*
         version: link:../schema
-    devDependencies:
       '@types/node':
         specifier: ^22
         version: 22.20.0
+      esbuild:
+        specifier: ^0.21.5
+        version: 0.21.5
+      tsx:
+        specifier: ^4.7.0
+        version: 4.22.4
       typescript:
         specifier: ^5
         version: 5.9.3
@@ -57,19 +62,19 @@ importers:
       '@decklee/viewer':
         specifier: workspace:*
         version: link:../viewer
-      esbuild:
-        specifier: ^0.21.5
-        version: 0.21.5
-      reveal.js:
-        specifier: ^6.0.1
-        version: 6.0.1
     devDependencies:
       '@types/node':
         specifier: ^20.11.0
         version: 20.19.43
+      esbuild:
+        specifier: ^0.21.5
+        version: 0.21.5
       jsdom:
         specifier: ^25.0.0
         version: 25.0.1
+      reveal.js:
+        specifier: ^6.0.1
+        version: 6.0.1
       typescript:
         specifier: ^5.4.0
         version: 5.9.3
@@ -119,9 +124,6 @@ importers:
       '@decklee/schema':
         specifier: workspace:*
         version: link:../schema
-      astro:
-        specifier: ^6.4.8
-        version: 6.4.8(@types/node@20.19.43)(rollup@4.62.2)(tsx@4.22.4)(yaml@2.9.0)
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
@@ -135,6 +137,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^3.2.6
         version: 3.2.6(vitest@3.2.6(@types/debug@4.1.13)(@types/node@20.19.43)(jsdom@25.0.1)(tsx@4.22.4)(yaml@2.9.0))
+      astro:
+        specifier: ^6.4.8
+        version: 6.4.8(@types/node@20.19.43)(rollup@4.62.2)(tsx@4.22.4)(yaml@2.9.0)
       typescript:
         specifier: ^5.4.0
         version: 5.9.3
@@ -172,9 +177,6 @@ importers:
       '@decklee/schema':
         specifier: workspace:*
         version: link:../schema
-      reveal.js:
-        specifier: ^6.0.1
-        version: 6.0.1
     devDependencies:
       '@types/node':
         specifier: ^20.11.0
@@ -185,6 +187,9 @@ importers:
       jsdom:
         specifier: ^25.0.0
         version: 25.0.1
+      reveal.js:
+        specifier: ^6.0.1
+        version: 6.0.1
       typescript:
         specifier: ^5.4.0
         version: 5.9.3

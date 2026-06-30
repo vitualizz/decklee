@@ -11,9 +11,9 @@
 import { cpSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { basename, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { getRegisteredThemes } from "@decklee/design-system";
 import { safeValidateOutline } from "@decklee/schema";
+import { resolveInitScaffold } from "../paths.js";
 import { createReadlinePrompter, type Prompter } from "../prompt.js";
 
 const EXIT_OK = 0;
@@ -182,7 +182,7 @@ function ensureTargetWritable(target: string, force: boolean): void {
 }
 
 function scaffold(target: string): void {
-  const source = fileURLToPath(new URL("../../templates/init-scaffold", import.meta.url));
+  const source = resolveInitScaffold();
   cpSync(source, target, { recursive: true });
 }
 

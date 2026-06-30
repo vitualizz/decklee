@@ -18,18 +18,18 @@
     "node": ">=20.6"
   },
   "scripts": {
-    "build": "node --experimental-strip-types scripts/copy-template.ts && tsc -p tsconfig.json",
+    "build": "node --experimental-strip-types scripts/copy-template.ts && esbuild src/bin.ts --bundle --platform=node --format=esm --target=node20 --external:esbuild --external:reveal.js --splitting --outdir=dist",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "generate:agents-md": "node --experimental-strip-types scripts/generate-contract.ts"
-  },
-  "dependencies": {
-    "@decklee/core": "workspace:*",
-    "@decklee/schema": "workspace:*",
-    "@decklee/design-system": "workspace:*"
+    "generate:agents-md": "tsx scripts/generate-contract.ts"
   },
   "devDependencies": {
+    "@decklee/core": "workspace:*",
+    "@decklee/schema": "workspace:*",
+    "@decklee/design-system": "workspace:*",
     "@types/node": "^22",
+    "esbuild": "^0.21.5",
+    "tsx": "^4.7.0",
     "typescript": "^5",
     "vitest": "^3"
   }

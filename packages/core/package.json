@@ -4,12 +4,17 @@
   "description": "Maintainer-time assembler: bundles the viewer into a standalone HTML template and injects validated deck JSON for DeckLee.",
   "license": "MIT",
   "type": "module",
+  "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./assemble": {
+      "types": "./dist/assemble.d.ts",
+      "import": "./dist/assemble.js"
     }
   },
   "files": [
@@ -24,13 +29,13 @@
   "dependencies": {
     "@decklee/viewer": "workspace:*",
     "@decklee/design-system": "workspace:*",
-    "@decklee/schema": "workspace:*",
-    "reveal.js": "^6.0.1",
-    "esbuild": "^0.21.5"
+    "@decklee/schema": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
+    "esbuild": "^0.21.5",
     "jsdom": "^25.0.0",
+    "reveal.js": "^6.0.1",
     "typescript": "^5.4.0",
     "vitest": "^3.2.6"
   }

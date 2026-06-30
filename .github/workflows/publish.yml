@@ -1,0 +1,46 @@
+name: Publish to npm
+
+# Option A: the version lives in packages/cli/package.json. You bump it, commit,
+# then publish a GitHub Release. This workflow publishes whatever version the
+# package.json declares — after checking it matches the release tag.
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required for npm provenance (OIDC)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - name: Verify release tag matches package version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          PKG_VERSION=$(node -p "require('./packages/cli/package.json').version")
+          # Strip a leading "v" from the tag (v0.2.0 -> 0.2.0) before comparing.
+          TAG_VERSION=${TAG#v}
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Release tag ($TAG_VERSION) does not match packages/cli/package.json version ($PKG_VERSION). Bump the version and re-tag."
+            exit 1
+          fi
+
+      - run: pnpm install --frozen-lockfile
+
+      # Builds decklee AND its internal @decklee/* deps (build inputs, not published).
+      - run: pnpm -F decklee... build
+
+      - run: pnpm -F decklee publish --provenance --no-git-checks --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

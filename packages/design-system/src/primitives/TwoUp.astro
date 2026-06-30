@@ -1,5 +1,6 @@
 ---
 import type { TwoUpProps } from "@decklee/schema";
+import "./twoup.css";
 
 type Props = TwoUpProps & { theme_id: string };
 
@@ -49,55 +50,3 @@ const showRightImage = right_type === "image" && Boolean(right_image_src);
     )}
   </div>
 </div>
-
-<style>
-  .dk-twoup {
-    box-sizing: border-box;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: var(--dk-space-10);
-    padding: var(--dk-space-slide-pad-y) var(--dk-space-slide-pad-x);
-    background-color: var(--dk-color-bg-base);
-    color: var(--dk-color-fg-primary);
-    /* Own the alignment — do NOT inherit reveal.js's text-align:center.
-       Left-aligned body copy reads better in two columns. */
-    text-align: left;
-  }
-
-  .dk-twoup__pane {
-    display: flex;
-    flex-direction: column;
-    gap: var(--dk-space-5);
-  }
-
-  .dk-twoup__heading {
-    margin: 0;
-    font-family: var(--dk-type-family-display);
-    font-size: var(--dk-type-scale-h2);
-    font-weight: var(--dk-type-weight-bold);
-    line-height: var(--dk-type-lh-base);
-    letter-spacing: var(--dk-type-ls-display);
-    color: var(--dk-color-fg-primary);
-  }
-
-  .dk-twoup__body {
-    margin: 0;
-    font-family: var(--dk-type-family-body);
-    font-size: var(--dk-type-scale-body);
-    line-height: var(--dk-type-lh-relaxed);
-    color: var(--dk-color-fg-secondary);
-  }
-
-  .dk-twoup__image {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-  }
-
-  .dk-twoup__divider {
-    width: var(--dk-space-1);
-    align-self: stretch;
-    background-color: var(--dk-color-border);
-  }
-</style>

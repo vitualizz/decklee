@@ -1,5 +1,6 @@
 ---
 import type { QuoteProps } from "@decklee/schema";
+import "./quote.css";
 
 type Props = QuoteProps & { theme_id: string };
 
@@ -20,60 +21,3 @@ const showCaption = Boolean(attribution) || Boolean(context);
     </figcaption>
   )}
 </figure>
-
-<style>
-  .dk-quote {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: var(--dk-space-6);
-    margin: 0;
-    padding: var(--dk-space-slide-pad-y) var(--dk-space-slide-pad-x);
-    background-color: var(--dk-color-bg-base);
-    color: var(--dk-color-fg-primary);
-  }
-
-  .dk-quote[data-emphasis="centered"] {
-    align-items: center;
-    text-align: center;
-  }
-
-  .dk-quote[data-emphasis="ruled"] {
-    border-left: var(--dk-space-1) solid var(--dk-color-accent-1);
-  }
-
-  .dk-quote__text {
-    margin: 0;
-    font-family: var(--dk-type-family-display);
-    font-size: var(--dk-type-scale-h1);
-    font-weight: var(--dk-type-weight-bold);
-    line-height: var(--dk-type-lh-base);
-    letter-spacing: var(--dk-type-ls-display);
-    color: var(--dk-color-fg-primary);
-  }
-
-  .dk-quote__text::before {
-    content: "\201C";
-  }
-
-  .dk-quote__text::after {
-    content: "\201D";
-  }
-
-  .dk-quote__caption {
-    display: flex;
-    flex-direction: column;
-    gap: var(--dk-space-2);
-    font-family: var(--dk-type-family-body);
-    font-size: var(--dk-type-scale-caption);
-  }
-
-  .dk-quote__attr {
-    font-weight: var(--dk-type-weight-bold);
-    color: var(--dk-color-fg-secondary);
-  }
-
-  .dk-quote__context {
-    color: var(--dk-color-fg-muted);
-  }
-</style>

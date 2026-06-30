@@ -1,0 +1,47 @@
+.dk-code {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dk-space-5);
+  padding: var(--dk-space-slide-pad-y) var(--dk-space-slide-pad-x);
+  background-color: var(--dk-color-bg-base);
+  color: var(--dk-color-fg-primary);
+  /* Own the alignment — do NOT inherit reveal.js's text-align:center.
+     Heading + caption align left, coherent with the left-aligned code. */
+  text-align: left;
+}
+
+/* Self-scoped: <h2> collides with reveal.css `.reveal h2` (0,1,1). */
+.dk-code .dk-code__heading {
+  margin: 0;
+  font-family: var(--dk-type-family-display);
+  font-size: var(--dk-type-scale-h2);
+  font-weight: var(--dk-type-weight-bold);
+  line-height: var(--dk-type-lh-base);
+  letter-spacing: var(--dk-type-ls-display);
+  color: var(--dk-color-fg-primary);
+}
+
+/* Self-scoped: <pre> collides with reveal.css `.reveal pre` (0,1,1). */
+.dk-code .dk-code__pre {
+  margin: 0;
+  padding: var(--dk-space-8);
+  border-radius: var(--dk-space-3);
+  background-color: var(--dk-color-bg-surface);
+  overflow: auto;
+}
+
+.dk-code__code {
+  font-family: var(--dk-type-family-code);
+  font-size: var(--dk-type-scale-code);
+  line-height: var(--dk-type-lh-base);
+  color: var(--dk-color-fg-primary);
+}
+
+/* Self-scoped: <p> collides with reveal.css `.reveal p` (0,1,1). */
+.dk-code .dk-code__caption {
+  margin: 0;
+  font-family: var(--dk-type-family-body);
+  font-size: var(--dk-type-scale-caption);
+  color: var(--dk-color-fg-muted);
+}

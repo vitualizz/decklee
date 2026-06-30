@@ -47,6 +47,10 @@ const CSS_SOURCES: ReadonlyArray<string> = [
   "@decklee/design-system/tokens/typography",
   "@decklee/design-system/tokens/spacing",
   "@decklee/design-system/tokens/syntax",
+  "@decklee/design-system/primitives/twoup.css",
+  "@decklee/design-system/primitives/hero.css",
+  "@decklee/design-system/primitives/code.css",
+  "@decklee/design-system/primitives/quote.css",
 ];
 
 /**

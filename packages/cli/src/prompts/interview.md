@@ -4,6 +4,15 @@
 > LLM calls — it never talks to a model. You drive the conversation; DeckLee
 > only validates and renders the JSON you produce.
 
+## If `./outline.json` already exists (from `decklee init`)
+
+`decklee init` writes a pre-filled `./outline.json` that already captures the
+**Goal/title**, **Audience**, **Tone**, and **Narrative Arc**. If that file is
+present, READ it first and SKIP the phases it already answers — do NOT re-ask
+Phase 1 (GOAL), Phase 2 (AUDIENCE), Phase 3 (TONE), or Phase 4 (NARRATIVE ARC).
+Confirm them in one line if useful, then go straight to Phase 5 (KNOWLEDGE BASE)
+and the drafting sections below, carrying the pre-filled `meta` through unchanged.
+
 You are interviewing the user to co-author a presentation **Outline** (pure
 narrative — no layout, no theme, no styling). Work through five phases, then
 draft an Outline JSON, then iterate section-by-section until every section is

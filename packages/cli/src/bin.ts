@@ -18,11 +18,16 @@ Usage:
   decklee build <deck.json> [--out <file>] [--template <file>]
   decklee validate <file> [--kind deck|outline]
   decklee theme list
-  decklee init [--dir <path>]
+  decklee init <name> [--title <t>] [--audience <a>] [--tone <t>]
+                      [--narrative-arc <arc>] [--theme <id>] [--force]
 
 Options:
   -h, --help     Show this help
   -v, --version  Print the version
+
+init asks a few questions (title, audience, tone, structure, look) when run in a
+terminal. Pass them as flags (--audience, --tone, --narrative-arc are required)
+to run it non-interactively. --force overwrites a non-empty target folder.
 `;
 
 function readVersion(): string {
@@ -44,6 +49,12 @@ async function main(): Promise<number> {
       out: { type: "string" },
       kind: { type: "string" },
       dir: { type: "string" },
+      title: { type: "string" },
+      audience: { type: "string" },
+      tone: { type: "string" },
+      "narrative-arc": { type: "string" },
+      theme: { type: "string" },
+      force: { type: "boolean" },
       help: { type: "boolean", short: "h" },
       version: { type: "boolean", short: "v" },
     },
@@ -82,7 +93,17 @@ async function main(): Promise<number> {
     case "theme":
       return runTheme(positionals[1]);
     case "init":
-      return runInit({ dir: values.dir as string | undefined });
+      // Positional name takes precedence over --dir (handled inside runInit).
+      return runInit({
+        name: positionals[1],
+        dir: values.dir as string | undefined,
+        title: values.title as string | undefined,
+        audience: values.audience as string | undefined,
+        tone: values.tone as string | undefined,
+        narrativeArc: values["narrative-arc"] as string | undefined,
+        theme: values.theme as string | undefined,
+        force: values.force === true,
+      });
     default:
       process.stdout.write(USAGE);
       return 1;

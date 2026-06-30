@@ -5,6 +5,10 @@
   "license": "MIT",
   "type": "module",
   "private": true,
+  "sideEffects": [
+    "**/*.css",
+    "**/*.astro"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
